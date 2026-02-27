@@ -1,6 +1,7 @@
  const NavRoutes = {
     LOGIN:'Login',
-    PARTYHOME:'PartyHome'
+    PARTYHOME:'PartyHome',
+    QRCODE:'Qrcode'
  }
 
  export default NavRoutes

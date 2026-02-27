@@ -5,6 +5,8 @@ import RNHeader from '../../common/RNHeader'
 import { AddOrderModal, OrderItemView } from '../../components'
 import LottieView from 'lottie-react-native'
 import { hp, wp } from '../../theme'
+import { OrderItem } from '../../components/DriverFlow'
+import OrderQRCode from './OrderQRCode'
 
 const Home = () => {
   const [ordermodal, setordermodal] = useState(false)
@@ -12,7 +14,8 @@ const Home = () => {
    <RNContainer>
     <RNHeader backarrowshow={true}  title={'Order History'}/>
     <View>
-      <OrderItemView/>
+      {/* <OrderItemView/> */}
+      <OrderItem/>
     </View>
    <Pressable onPress={() => setordermodal(true)} style={styles.addbtnstyle}>
      <LottieView autoPlay loop  style={styles.btnstyle} source={require('../../assets/Lottie/AddDetlis.json')}/>
