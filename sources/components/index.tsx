@@ -1,2 +1,1 @@
-export {default as OrderItemView} from './OrderItemView'
-export{default as AddOrderModal} from './AddOrderModal'
+export {default as LogoutModal} from './LogoutModal'

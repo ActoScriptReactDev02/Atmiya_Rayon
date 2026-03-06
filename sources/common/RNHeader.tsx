@@ -1,21 +1,25 @@
 
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View,TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../theme'
 import RNText from './RNText'
 import RNImage from './RNImage'
 import { Images } from '../constants'
+import { useNavigation } from '@react-navigation/native'
 
-const RNHeader = ({title, backarrowshow}) => {
+const RNHeader = ({title, backarrowshow,onLeftPress,onRightPress}) => {
+  const navigation = useNavigation()
   return (
     <View style={styles.continetstyle}>
-       { !backarrowshow && <View style={[styles.imagerapstyle,{backgroundColor:Colors.Grey + '20'}]}>
+       { backarrowshow ? <TouchableOpacity onPress={onLeftPress}>
+         <RNImage tintColor={Colors.Orange} source={Images.Profile} style={{ height:wp(7),width:wp(7)}}/>
+       </TouchableOpacity> : <TouchableOpacity onPress={() => (onLeftPress ? onLeftPress?.() : navigation.goBack())} style={[styles.imagerapstyle,{backgroundColor:Colors.Grey + '20'}]}>
          <RNImage source={Images.backarrow} style={styles.iconestyle}/>
-        </View>}
+        </TouchableOpacity>}
      <RNText numOfLines={1} style={styles.titlestyle} children={title}/>
-     <View style={[styles.imagerapstyle,{backgroundColor:Colors.Orange + '20'}]}>
+     <TouchableOpacity onPress={onRightPress} style={[styles.imagerapstyle,{backgroundColor:Colors.Orange + '20'}]}>
         <RNImage source={Images.notification} style={styles.iconestyle}/>
-     </View>
+     </TouchableOpacity>
     </View>
   )
 }

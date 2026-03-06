@@ -1,6 +1,6 @@
 import Axios from 'axios';
-import {Functions} from '../utils';
 import URL from './URL';
+import Functions from '../utils/Functions';
 
 const REQUEST = async ({
   Method,
@@ -10,7 +10,8 @@ const REQUEST = async ({
   NeedToken = true,
 }) => {
   const appData = await Functions.getUserData();
-  const Headers = Header(NeedToken, appData?.AuthorizationKey, IsformData);
+  
+  const Headers = Header(NeedToken, appData?.Token, IsformData);
   const options = {
     method: Method,
     headers: Headers,
@@ -54,4 +55,6 @@ const Header = (NeedToken, Token, IsformData) => {
   }
   return apiHeaders;
 };
+
+
 export default REQUEST;

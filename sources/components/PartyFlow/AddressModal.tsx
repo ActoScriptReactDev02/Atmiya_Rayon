@@ -1,8 +1,8 @@
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../theme'
-import { RNImage, RNStyles, RNText } from '../common'
-import { Images } from '../constants'
+import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
+import { RNImage, RNStyles, RNText } from '../../common'
+import { Images } from '../../constants'
 
 const AddressModal = ({data,visible, onRequestClose, selectaddress}) => {
   return (
@@ -24,7 +24,10 @@ const AddressModal = ({data,visible, onRequestClose, selectaddress}) => {
                 <View style={styles.selectedAddressIcon}>
                 <RNImage tintColor={'#4CAF50'} style={{height:wp(6), width:wp(6)}} source={Images.loaction}/>
                 </View>
-                  <RNText style={styles.addresstextstyle} numOfLines={2} children={item.address}/>
+               <View style={{flex:1}}>
+                 <RNText family={FontFamily.SemiBold} numOfLines={2} children={item.City}/>
+                  <RNText style={styles.addresstextstyle} numOfLines={2} children={item.Address}/>
+                  </View>
             </Pressable>
            )}/> 
            </View>
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
     },
     addresstextstyle:{
         flex:1,
-        fontSize:FontSize.font16
+        fontSize:FontSize.font12
     },
       selectedAddressIcon: {
     width: wp(10),

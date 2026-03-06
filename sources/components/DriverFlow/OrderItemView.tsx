@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Colors, FontSize, hp, normalize, wp } from '../theme'
-import { RNImage, RNStyles, RNText } from '../common'
-import { Images } from '../constants'
+import { Colors, FontSize, hp, normalize, wp } from '../../theme'
+import { RNImage, RNStyles, RNText } from '../../common'
+import { Images } from '../../constants'
 
 const OrderItemView = () => {
   return (
