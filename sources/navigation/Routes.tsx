@@ -30,7 +30,7 @@ const userdatahandle = async () => {
        SetisLoading(false);
     }catch(error){
        SetisLoading(false)
-      console.log('Routes data error -->', error);
+      //console.log('Routes data error -->', error);
       
     }
   }

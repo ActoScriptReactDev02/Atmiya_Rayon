@@ -1,5 +1,5 @@
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
 import { RNButton, RNImage, RNInput, RNStyles, RNText, RnToast } from '../../common'
 import { Images } from '../../constants'
@@ -9,7 +9,7 @@ import ImagePicker from "react-native-image-crop-picker";
 import AddressModal from './AddressModal'
 import FetchMethod from '../../api/FetchMethod'
 
-const AddOrderModal = ({visible, onRequestClose, addressData, onclose, toastdata}) => {
+const AddOrderModal = ({visible, onRequestClose, addressData, onclose, toastdata, editData}) => {
     const [isnavigate, setisnavigate] = useState(false)
     const [datepicker, setdatepicker]= useState(false);
     const [addrssmodal, setaddrssmodal] = useState(false);
@@ -21,33 +21,57 @@ const AddOrderModal = ({visible, onRequestClose, addressData, onclose, toastdata
             uri:'',
             base64:''
         },
-        //address:'',
         remark:''
     })
     const imageerror = isnavigate && state.imagedata.base64 == ''
     const isvalid = state.date != '' && state.imagedata.base64 != '' && Object.keys(selectAddress).length > 0;
 
+useEffect(() => {
+  if(Object.keys(editData).length > 0){
+    setselectAddress(editData.AddressDetails),
+    setstate(p => ({...p, date: moment(editData.OrderDate, "DD MMM YYYY hh:mm A").toDate() , imagedata:{uri:editData.OrderPhoto}, remark:editData.Remark}))
+  } else{
+    setstate(p => ({...p, date:new Date(), imagedata:{base64:'',uri:''}, remark:''}))
+  }
+},[])
 
 
-const handlegellary  = () => {
-ImagePicker.openPicker({
-//   width: 500,
-//   height: 400,
-  cropping: true,
-  includeBase64:true
-}).then((image) => {
-  setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
-});
-}
+const handlegellary = () => {
+  ImagePicker.openPicker({
+    cropping: true,
+    includeBase64: true
+  })
+  .then((image) => {
+    setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+  })
+  .catch((error) => {
+    console.log('handlegellary error -->', error);
+
+    if (error.code === 'E_PICKER_CANCELLED') {
+       setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+    }
+  });
+};
 
 const handlecamara = () => {
-    ImagePicker.openCamera({
-  width: 300,
-  height: 400,
-  cropping: true,
-}).then((image) => {
-  setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
-})}
+  ImagePicker.openCamera({
+    width: 300,
+    height: 400,
+    cropping: true,
+    includeBase64: true,
+  })
+  .then((image) => {
+   setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+  })
+  .catch((error) => {
+    if (error.code === 'E_PICKER_CANCELLED') {
+     setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+    } else {
+      console.log('Camera error:', error);
+    }
+  });
+};
+
 
 const handleorderadd = async () => {
   setisnavigate(true)
@@ -63,7 +87,6 @@ const handleorderadd = async () => {
               "Remark": state.remark
               }
     })
-   console.log('handleorderadd response',response);
     if(response.ResponseCode == 0){
      toastdata({
       message:response.ResponseMessage,
@@ -83,6 +106,37 @@ const handleorderadd = async () => {
          Title:'Failed'
      })
   }
+  }
+}
+
+const handleupdate = async () => {
+  
+  try{
+    const response = await FetchMethod.PUT({
+      EndPoint:`Order/UpdateOrder/${editData.OrderUniqueId}`,
+      Params:{
+  "OrderDate": state.date.toISOString(),
+  "OrderPhoto": state.imagedata.base64 || '',
+  "OrderDeliveryAddressId": selectAddress.Id,
+  "Remark": state.remark
+}
+    })
+    
+    if(response.ResponseCode == 0){
+       toastdata({
+      message:response.ResponseMessage,
+        Sucess:true,
+         Title:'Success'
+     })
+       onclose()
+    }
+  }catch(error){
+     setisLoading(false);
+     toastdata({
+      message:error?.responseMSG.Message,
+        Sucess:false,
+         Title:'Failed'
+     })
   }
 }
 
@@ -185,7 +239,7 @@ const handleorderadd = async () => {
                    </View>
                   {isLoading ? <View style={styles.btnloaderstyle}>
                     <ActivityIndicator size={'small'} color={Colors.White}/>
-                  </View> :<RNButton  onPress={() => handleorderadd()} btnstyles={{marginTop:hp(0), marginBottom: hp(2)}} title={'Save'}/> }
+                  </View> :<RNButton  onPress={() => Object.keys(editData).length >0 ? handleupdate() : handleorderadd()} btnstyles={{marginTop:hp(0), marginBottom: hp(2)}} title={'Save'}/> }
               </View>
               </ScrollView>
          </View>

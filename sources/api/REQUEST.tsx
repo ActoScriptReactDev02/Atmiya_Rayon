@@ -36,7 +36,7 @@ const REQUEST = async ({
       return responseJson.data;
     }
   } catch (error) {
-    console.log('request error-->', error.response.data);
+    //console.log('request error-->', error.response.data);
     throw error?.response
       ? {
           responseMSG: error?.response?.data,

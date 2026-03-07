@@ -60,6 +60,26 @@ const ClearValue = async () => {
    await AsyncStorage.multiRemove(value);  
 };
 
+const requestAndroidPermission = async () => {
+  if (Platform.OS !== "android") return true;
+
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      {
+        title: "Storage Permission Required",
+        message: "App needs access to your storage to save QR code",
+        buttonPositive: "OK",
+        buttonNegative: "Cancel",
+      }
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
+
 
 
 const Functions = {
@@ -77,7 +97,7 @@ const Functions = {
   getTicketData,
   setFcmToken,
   getFcmToken,
-
+requestAndroidPermission
 };
 
 export default Functions;

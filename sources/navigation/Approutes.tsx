@@ -6,7 +6,7 @@ import Drivernavigtion from './Approutes/Drivernavigtion'
 
 const Approutes = ({type}) => {
   return (
-     type == 'Team Memeber' ?<TeamMembernavigtion/> : type == 'Driver' ? <Drivernavigtion/> : <Partynavigtion/>
+     type == 'Team Member' ?<TeamMembernavigtion/> : type == 'Driver' ? <Drivernavigtion/> : <Partynavigtion/>
   )
 }
 

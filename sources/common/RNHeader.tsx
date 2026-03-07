@@ -7,7 +7,7 @@ import RNImage from './RNImage'
 import { Images } from '../constants'
 import { useNavigation } from '@react-navigation/native'
 
-const RNHeader = ({title, backarrowshow,onLeftPress,onRightPress}) => {
+const RNHeader = ({title, backarrowshow,onLeftPress,onRightPress,righticonesource}) => {
   const navigation = useNavigation()
   return (
     <View style={styles.continetstyle}>
@@ -18,7 +18,7 @@ const RNHeader = ({title, backarrowshow,onLeftPress,onRightPress}) => {
         </TouchableOpacity>}
      <RNText numOfLines={1} style={styles.titlestyle} children={title}/>
      <TouchableOpacity onPress={onRightPress} style={[styles.imagerapstyle,{backgroundColor:Colors.Orange + '20'}]}>
-        <RNImage source={Images.notification} style={styles.iconestyle}/>
+        <RNImage source={righticonesource || Images.notification} style={styles.iconestyle}/>
      </TouchableOpacity>
     </View>
   )

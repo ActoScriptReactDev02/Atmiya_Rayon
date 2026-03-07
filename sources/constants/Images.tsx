@@ -24,7 +24,10 @@ const Images ={
     errorIcone:require(Iconepath + 'error' + png),
     successicone:require(Iconepath + 'success' + png),
     Profile:require(Iconepath + 'Profile' + png),
-    logoutimage:require(ImagePath + 'logout' + png)
+    logoutimage:require(ImagePath + 'logout' + png),
+    Delete:require(Iconepath + 'Delete' + png ),
+    DeleleImage: require(ImagePath + 'DeleleImage' + png),
+    scanner:require(Iconepath + 'scanner' + png)
 }
 
 export default Images
