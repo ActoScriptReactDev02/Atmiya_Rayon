@@ -7,10 +7,11 @@ import { OrderItem } from '../../components/TeamMember'
 import UploadInvoiceModal from './UploadInvoiceModal'
 import { useNavigation } from '@react-navigation/native'
 import { NavRoutes } from '../../navigation'
+import { ImageViewerModal } from '../../components'
 
 const OrderHistory = () => {
-  const [isloding,setisloading] = useState(false);
-  const [data, setdata] = useState([]);
+const [isloding,setisloading] = useState(false);
+const [data, setdata] = useState([]);
 const [selecteddata, Setselecteddata] = useState({});
 const [uploadModal, setuploadModal] = useState(false);
 const navigtions = useNavigation();
@@ -20,6 +21,8 @@ const navigtions = useNavigation();
   Sucess:false,
   Title:''
 })
+  const [imagevisible, setimagevisible] = useState(false);
+
 
   useEffect(() => {
     getorderapi()
@@ -76,7 +79,7 @@ const navigtions = useNavigation();
       <RNHeader onLeftPress={()=> navigtions.navigate(NavRoutes.TEAMPROFILE)} backarrowshow={true} title={'Order History'} />
       <FlatList  keyExtractor={(item,index) => index.toString()}  data={data} 
       renderItem={({item,inex}) => (
-        <OrderItem items={item} onPress={() => {Setselecteddata(item), setuploadModal(true)}}/>
+        <OrderItem items={item} onPress={() => {Setselecteddata(item),setuploadModal(true)}} orderimagepress={() =>{Setselecteddata(item), setimagevisible(true)}}/>
       )}
       ListEmptyComponent={() => !isloding && <View style={{...RNStyles.flexCenter}}>
         <RNText children={'No data found'}/>
@@ -84,6 +87,7 @@ const navigtions = useNavigation();
      {uploadModal && <UploadInvoiceModal toastdata={data => handletoast(data)} visible={uploadModal} OrderUniqueId={selecteddata.OrderUniqueId} 
      onRequestClose={() => {setuploadModal(false), Setselecteddata({})}} onclose={() => {setuploadModal(false), Setselecteddata({}),getorderapi()}} />}
        {showtoast.isShow && <RnToast  Message={showtoast.message} isSuccess={showtoast.Sucess} Title={showtoast.Title}  />}
+       {imagevisible && <ImageViewerModal onRequestClose={() =>{ setimagevisible(false), Setselecteddata({})}} visible={imagevisible} imageURL={selecteddata.OrderPhoto}/>}
     </RNContainer>
   )
 }

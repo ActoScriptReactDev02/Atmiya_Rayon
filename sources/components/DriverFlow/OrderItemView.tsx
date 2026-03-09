@@ -3,10 +3,13 @@ import React from 'react'
 import { Colors, FontSize, hp, normalize, wp } from '../../theme'
 import { RNImage, RNStyles, RNText } from '../../common'
 import { Images } from '../../constants'
+import { useNavigation } from '@react-navigation/native'
+import { NavRoutes } from '../../navigation'
 
 const OrderItemView = () => {
+  const navigtion = useNavigation()
   return (
-    <View style={styles.continer}>
+    <Pressable onPress={() => navigtion.navigate(NavRoutes.DRIVERORDERDETAILS)} style={styles.continer}>
         <View style={{ flex:1}}>
            <View style={styles.detailswrapstyle}>
              <RNText style={styles.labelstyle} children={'Item Code :'}/>
@@ -32,7 +35,7 @@ const OrderItemView = () => {
               <RNImage source={Images.mapicon} style={styles.iconestyle}/>
             </View>
           </View>
-    </View>
+    </Pressable>
   )
 }
 

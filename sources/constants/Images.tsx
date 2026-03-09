@@ -27,7 +27,8 @@ const Images ={
     logoutimage:require(ImagePath + 'logout' + png),
     Delete:require(Iconepath + 'Delete' + png ),
     DeleleImage: require(ImagePath + 'DeleleImage' + png),
-    scanner:require(Iconepath + 'scanner' + png)
+    scanner:require(Iconepath + 'scanner' + png),
+    newscan:require(ImagePath + 'newscan' + png)
 }
 
 export default Images

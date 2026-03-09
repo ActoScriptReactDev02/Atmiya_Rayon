@@ -67,9 +67,8 @@ const handlecamara = () => {
 };
 
 const updateinvoice = async () => {
-  console.log('state.base64',state.base64);
-  
     try{
+      setisloading(true);
     const response = await FetchMethod.POST({
             EndPoint:`Order/UpdateOrderStatus`,
             Params:{
@@ -84,7 +83,8 @@ const updateinvoice = async () => {
         Sucess:true,
          Title:'Success'
      });
-            onclose()
+            onclose();
+            setisloading(false);
         }
     }catch(error){
         console.log('updateinvoice error -->',error);

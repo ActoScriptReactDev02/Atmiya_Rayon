@@ -1,12 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../../theme'
 import { RNImage, RNStyles, RNText } from '../../common'
 import { Images } from '../../constants'
 
-const OrderItem = ({items,onPress}) => {
+const OrderItem = ({items,onPress,orderimagepress}) => {
   return (
-    <Pressable onPress={onPress} style={[styles.card]}>
+    <Pressable disabled={items.IsReadyforDelivery} onPress={onPress} style={[styles.card]}>
       <View style={[styles.headerstyle,styles.cardspace]}>
         <View style={styles.mainwrapstyle}>
     <RNText children={items.OrderCode} family={FontFamily.SemiBold} size={FontSize.font14}/>
@@ -18,9 +18,9 @@ const OrderItem = ({items,onPress}) => {
       </View>
       <View style={styles.cardspace}>
            <View style={styles.imagerowstyle}>
-               <View style={styles.imagestyle}>
+               <TouchableOpacity onPress={orderimagepress} style={styles.imagestyle}>
                   <RNImage ImageUri={items.OrderPhoto}/>
-               </View>
+               </TouchableOpacity>
               <View style={{flex:1}}>
                 <View style={styles.detailswrapstyle}>
                   <RNImage tintColor={Colors.Orange} style={styles.iconestyle} source={Images.User}/>
