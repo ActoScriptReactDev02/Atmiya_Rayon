@@ -105,8 +105,8 @@ const updateinvoice = async () => {
     <View style={styles.modalcontiner}>
         <View style={styles.modalwrapstyle}>
              <Pressable onPress={() => onRequestClose()} style={styles.closebtnstyle}>
-                                <RNImage source={Images.close} style={styles.iconestyle}/>
-                            </Pressable>
+                  <RNImage source={Images.close} style={styles.iconestyle}/>
+               </Pressable>
         {state.uri !='' ? <View style={styles.photoPreviewContainer}> 
                    <RNImage ImageUri={state.uri}  style={styles.photoPreview} />
                    <View style={styles.btnwrapstyle}>

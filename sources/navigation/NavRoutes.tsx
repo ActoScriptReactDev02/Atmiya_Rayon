@@ -9,7 +9,9 @@
     TEAMORDERDETAILS:'Team OrderDetails',
     DRIVERPROFILE:'Driver Profile',
     DRIVERORDERDETAILS:'Driver Order Details',
-    SCAN:'Scanner'
+    SCAN:'Scanner',
+    SCANORDER:'Scan Order Details',
+    TRIP:'Start Trip'
  }
 
  export default NavRoutes

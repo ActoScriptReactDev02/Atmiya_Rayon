@@ -28,7 +28,11 @@ const Images ={
     Delete:require(Iconepath + 'Delete' + png ),
     DeleleImage: require(ImagePath + 'DeleleImage' + png),
     scanner:require(Iconepath + 'scanner' + png),
-    newscan:require(ImagePath + 'newscan' + png)
+    newscan:require(ImagePath + 'newscan' + png),
+    DeliveryDone:require(ImagePath + 'deliveryDone' + png),
+    DeliveryPending:require(ImagePath + 'deliveryPending' + png),
+    doneicone:require(Iconepath + 'done' + png),
+    rightback:require(Iconepath + 'rightback' + png)
 }
 
 export default Images
