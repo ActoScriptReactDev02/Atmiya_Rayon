@@ -17,7 +17,22 @@ const Images ={
     camera:require(Iconepath + 'camera' + png),
     calendar:require(Iconepath+'calendar' + png),
     Edit:require(Iconepath + 'edit' + png),
-    loaction:require(Iconepath + 'loaction' + png)
+    loaction:require(Iconepath + 'loaction' + png),
+    Splashimage:require(ImagePath + 'SplashScreen' + png),
+    cityicone:require(Iconepath + 'cityicone' + png),
+    driving: require(Iconepath + 'driving' + png),
+    errorIcone:require(Iconepath + 'error' + png),
+    successicone:require(Iconepath + 'success' + png),
+    Profile:require(Iconepath + 'Profile' + png),
+    logoutimage:require(ImagePath + 'logout' + png),
+    Delete:require(Iconepath + 'Delete' + png ),
+    DeleleImage: require(ImagePath + 'DeleleImage' + png),
+    scanner:require(Iconepath + 'scanner' + png),
+    newscan:require(ImagePath + 'newscan' + png),
+    DeliveryDone:require(ImagePath + 'deliveryDone' + png),
+    DeliveryPending:require(ImagePath + 'deliveryPending' + png),
+    doneicone:require(Iconepath + 'done' + png),
+    rightback:require(Iconepath + 'rightback' + png)
 }
 
 export default Images

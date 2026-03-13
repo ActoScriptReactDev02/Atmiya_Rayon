@@ -6,14 +6,20 @@
  */
 
 import { NewAppScreen } from '@react-native/new-app-screen';
+import { useEffect } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import Functions from './sources/utils/Functions';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
+
+  useEffect(() => {
+    Functions.requestAndroidPermission()
+  },[])
 
   return (
     <SafeAreaProvider>

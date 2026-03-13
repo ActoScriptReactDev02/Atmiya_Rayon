@@ -26,6 +26,13 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs your location to start the trip</string>
+
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>This app needs your location to track trip progress</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+<string>We need permission to save QR code to your Photos</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

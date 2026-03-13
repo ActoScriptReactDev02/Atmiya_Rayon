@@ -3,10 +3,10 @@ import React from 'react'
 import RNText from './RNText'
 import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../theme'
 
-const RNButton = ({title,onPress,btnstyles}) => {
+const RNButton = ({title,onPress,btnstyles,btntextstyle,disabled}) => {
   return (
-    <Pressable onPress={onPress} style={[styles.btnstyle,btnstyles]}>
-    <RNText children={title} style={styles.textstyle}/>
+    <Pressable disabled={disabled} onPress={onPress} style={[styles.btnstyle,btnstyles]}>
+    <RNText children={title} style={[styles.textstyle,btntextstyle]}/>
     </Pressable>
   )
 }
