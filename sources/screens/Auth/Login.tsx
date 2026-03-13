@@ -42,7 +42,7 @@ const isvalid = isnavigate && state.password.length >4 && state.username.length 
               "Password": state.password
        }
       });
-    //  console.log('response',response);
+     console.log('response',response);
       
       if(response.ResponseCode == 0){
         await Functions.setUserData(response);
@@ -51,13 +51,14 @@ const isvalid = isnavigate && state.password.length >4 && state.username.length 
         handletoast(response.ResponseMessage,true,'Success')
       } else{
         distpatch(onAuthChange(false))
+          handletoast(response.ResponseMessage,false,'Success')
       }
     }
      SetisLoading(false);
   }catch(error){
-    //console.log('Login api error --->',error);
+    console.log('Login api error --->',error);
      SetisLoading(false);
-        if(error.responseMSG){
+        if(error.responseMSG.Message){
           handletoast(error?.responseMSG.Message,false,'Login failed.')
         }
      }

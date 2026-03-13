@@ -110,7 +110,8 @@ const handleorderadd = async () => {
 }
 
 const handleupdate = async () => {
-  
+  setisnavigate(true)
+  if (!isvalid) return
   try{
     const response = await FetchMethod.PUT({
       EndPoint:`Order/UpdateOrder/${editData.OrderUniqueId}`,
