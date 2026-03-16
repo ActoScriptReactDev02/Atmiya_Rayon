@@ -10,7 +10,7 @@ import Functions from '../../utils/Functions'
 import { AddOrderModal, OrderItem } from '../../components/PartyFlow'
 import { useNavigation } from '@react-navigation/native'
 import { NavRoutes } from '../../navigation'
-import { DeleleModal } from '../../components'
+import { DeleleModal, ImageViewerModal } from '../../components'
 
 const Home =  () => {
   const [ordermodal, setordermodal] = useState(false);
@@ -21,6 +21,8 @@ const Home =  () => {
   const [showdeletemodal, setshowdeletemodal] = useState(false);
   const [deletedata, setdeletedata] = useState({})
   const navigation = useNavigation();
+   const [imagevisible, setimagevisible] = useState(false);
+   const [selecteddata, Setselecteddata] = useState({});
   const [showtoast,Setshowtoast] = useState({
   isShow:false,
   message:'',
@@ -146,7 +148,7 @@ const deleteapi = async() => {
     <RNHeader onLeftPress={() => navigation.navigate(NavRoutes.PARTYPROFILE)} backarrowshow={true}  title={'Order History'}/>
     <View>
       <FlatList bounces={false} contentContainerStyle={{rowGap:hp(2), paddingBottom:hp(18)}} data={orderData} renderItem={({item,index}) => (
-        <OrderItem item={item} editPress={() => handleeditdata(item)} deletepress={() => handledeletebtn(item)} />
+        <OrderItem item={item} editPress={() => handleeditdata(item)} deletepress={() => handledeletebtn(item)} orderimagepress={() =>{Setselecteddata(item), setimagevisible(true)}} />
       )}/>
     </View>
    <Pressable onPress={() => setordermodal(true)} style={styles.addbtnstyle}>
@@ -158,6 +160,8 @@ const deleteapi = async() => {
         {/* <RnToast/> */}
        {showdeletemodal && <DeleleModal onPress={() => deleteapi()} visible={showdeletemodal} title={'Delete Order'} subcontent={'Are you sure you want to remove this order from the list?'} 
         onRequestClose={() => {setshowdeletemodal(false),setdeletedata({})}}/>}
+       {imagevisible && <ImageViewerModal onRequestClose={() =>{ setimagevisible(false), Setselecteddata({})}} visible={imagevisible} imageURL={selecteddata.OrderPhoto}/>}
+
    </RNContainer>
   )
 }

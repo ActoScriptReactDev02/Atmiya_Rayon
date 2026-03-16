@@ -6,9 +6,7 @@ import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '
 import { Images } from '../../constants'
 import ImagePicker from "react-native-image-crop-picker";
 import { Pressable } from 'react-native-gesture-handler'
-import { opacity } from 'react-native-reanimated/lib/typescript/Colors'
 import FetchMethod from '../../api/FetchMethod'
-import { ToastModal } from '../../components'
 
 const ScanOrder = ({route}) => {
   const [data,setdata] = useState(route.params.Data);

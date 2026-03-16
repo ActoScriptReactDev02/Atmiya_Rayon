@@ -1,16 +1,16 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { Colors, FontSize, hp, wp, normalize, height, width, FontFamily, isIOS } from '../../theme'
 import { RNImage, RNStyles, RNText } from '../../common'
 import { Images } from '../../constants'
 
-const OrderItem = ({item,editPress,deletepress}) => {
+const OrderItem = ({item,editPress,deletepress,orderimagepress}) => {
   return (
     <View style={styles.continer}>
         <View style={{flex: 1, flexDirection:'row', columnGap:wp(2)}}>
-          <View style={styles.imagewrapstyle}>
+          <TouchableOpacity  onPress={orderimagepress} style={styles.imagewrapstyle}>
             <RNImage resizeMode={'cover'} ImageUri={item.OrderPhoto} style={{...RNStyles.image100,borderRadius:normalize(5)}}/>
-          </View>
+          </TouchableOpacity>
             <View style={{flex:1}}>
             <View style={styles.titlewrapview}>
              <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.OrderCode}/>
@@ -35,7 +35,7 @@ const OrderItem = ({item,editPress,deletepress}) => {
              <RNImage tintColor={Colors.Orange} style={styles.iconestyle} source={Images.cityicone}/>
              <RNText numOfLines={3}  style={styles.valuetextstyle} children={item.AddressDetails.City+ ', '+ item.AddressDetails.Pincode}/>
            </View>
-           <View style={[styles.detailswrapstyle,{justifyContent:'flex-end'}]}>
+          { item.IsOrderConfirm != 'Confirm' &&<View style={[styles.detailswrapstyle,{justifyContent:'flex-end'}]}>
             <Pressable onPress={editPress}>
                 <RNImage tintColor={Colors.Blue} style={styles.accbtnstyle} source={Images.Edit}/>
             </Pressable>
@@ -43,7 +43,7 @@ const OrderItem = ({item,editPress,deletepress}) => {
                 <Pressable onPress={deletepress}>
                   <RNImage tintColor={Colors.Red} style={styles.accbtnstyle} source={Images.Delete}/>
                 </Pressable>
-            </View>
+            </View>}
             </View>
            </View>
     </View>

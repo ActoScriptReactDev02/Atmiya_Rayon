@@ -5,155 +5,167 @@ import {
   PermissionsAndroid,
   Platform
 } from 'react-native'
+
 import React, { useEffect, useState, useRef } from 'react'
+import Geolocation from 'react-native-geolocation-service'
 import { RNContainer } from '../../common'
 import RNHeader from '../../common/RNHeader'
 import { Images } from '../../constants'
 import { useNavigation } from '@react-navigation/native'
 import { NavRoutes } from '../../navigation'
 import { OrderItemView } from '../../components/DriverFlow'
-import BackgroundGeolocation from "react-native-background-geolocation";
 
 const OrderDetails = ({ route }) => {
+  const navigation = useNavigation()  
+  const data = route.params.Data
+  const [isNavigating, setIsNavigating] = useState(false)
+  const [currentStopIndex, setCurrentStopIndex] = useState(0)
+  const watchId = useRef(null)
+  const [navigationStarted, setNavigationStarted] = useState(false);
 
-  const navigation = useNavigation();
-  const data = route.params.Data;
-
-  const [currentStopIndex, setCurrentStopIndex] = useState(0);
-  const watchId = useRef(null);
-
-  // Delivery locations
+  // const locations = [  
+  //   { lat: 21.2235511, lng: 72.8068688 },
+  //   { lat: 21.2237918, lng: 72.8066622 },
+  //   { lat: 21.2183721, lng: 72.8093945 },
+  // ]
 const locations = [
-  { lat: 21.2235511, lng: 72.8068688 }, // ActoScript
-  { lat: 21.2237918, lng: 72.8066622 }, // Nilkanth Hub
-  { lat: 21.2183721, lng: 72.8093945 }, // Causeway Rd
+  { lat: 21.2235511, lng: 72.8068688 }, // ActoScript / Nilkanth Business Hub
+  { lat: 21.2043355, lng: 72.8401923 }, // Surat Railway Station
+  { lat: 21.7033128, lng: 72.9992777 }  // Bharuch Railway Station
 ];
 
-  // Ask location permission
   const requestLocationPermission = async () => {
 
     if (Platform.OS === "android") {
 
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-      );
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+      title: "Location Permission",
+      message: "App needs location access",
+      buttonPositive: "OK",
+    }
+      )
 
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+      return granted === PermissionsAndroid.RESULTS.GRANTED
     }
 
-    return true;
-  };
+    return true
+  }
 
-  // Open Google Maps Navigation
   const openGoogleMap = () => {
+    setNavigationStarted(true);   // START TRACKING
+    const origin = `${locations[0].lat},${locations[0].lng}`
 
-    const origin = `${locations[0].lat},${locations[0].lng}`;
-
-    const destination = `${locations[locations.length - 1].lat},${locations[locations.length - 1].lng}`;
+    const destination = `${locations[locations.length - 1].lat},${locations[locations.length - 1].lng}`
 
     const waypoints = locations
       .slice(1, locations.length - 1)
       .map(loc => `${loc.lat},${loc.lng}`)
-      .join("|");
+      .join("|")
 
     const url =
-      `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}`;
+      `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}`
+      console.log('url',url);
+      
 
-    Linking.openURL(url);
-  };
+    Linking.openURL(url)
+  }
 
-  // Start GPS tracking
-useEffect(() => {
+  useEffect(() => {
 
-  BackgroundGeolocation.onLocation(location => {
+    const startTracking = async () => {
 
-    const { latitude, longitude } = location.coords;
+      const granted = await requestLocationPermission()
+      if (!granted) {
+    console.log("Permission denied");
+    return;
+  }
 
-    console.log("Driver Location:", latitude, longitude);
+      watchId.current = Geolocation.watchPosition(
 
-    checkLocation(latitude, longitude);
+        (position) => {
 
-  });
+          const { latitude, longitude } = position.coords
 
-  BackgroundGeolocation.ready({
+          console.log("Driver Location:", latitude, longitude)
 
-    desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-    distanceFilter: 10,
-    stopOnTerminate: false,
-    startOnBoot: true,
+          checkLocation(latitude, longitude)
 
-  }).then(state => {
+        },
 
-    if (!state.enabled) {
-      BackgroundGeolocation.start();
+        (error) => {
+          console.log("Location Error:", error)
+        },
+
+        {
+          enableHighAccuracy: true,
+          distanceFilter: 10,
+          interval: 5000,
+          fastestInterval: 2000,
+          showsBackgroundLocationIndicator: true
+        }
+      )
     }
 
-  });
+    startTracking()
 
-  return () => {
-    BackgroundGeolocation.removeAllListeners();
-  };
+    return () => {
 
-}, []);
+      if (watchId.current !== null) {
+        Geolocation.clearWatch(watchId.current)
+      }
 
-  // Check if reached delivery location
+    }
+
+  }, [currentStopIndex])
+
   const checkLocation = (lat, lng) => {
 
-    const target = locations[currentStopIndex];
+    if (!navigationStarted) return;  // ❗IMPORTANT
+    if (isNavigating) return
 
-    if (!target) return;
+    const target = locations[currentStopIndex]
+    if (!target) return
 
-    const distance = getDistance(
-      lat,
-      lng,
-      target.lat,
-      target.lng
-    );
+    const distance = getDistance(lat, lng, target.lat, target.lng)
 
-    console.log("Distance:", distance);
+    console.log("Distance:", distance)
 
-    if (distance < 40) {
-
-      console.log("Reached delivery location");
-
+    if (distance < 50) {
+      setIsNavigating(true)
+      console.log("Reached delivery location")
       navigation.navigate(NavRoutes.SCAN, {
-
         stopIndex: currentStopIndex,
-
         onComplete: () => {
-
-          // Move to next stop
-          setCurrentStopIndex(prev => prev + 1);
-
+          setCurrentStopIndex(prev => prev + 1)
+          setIsNavigating(false)
         }
-
-      });
+      })
 
     }
-  };
 
-  // Distance formula
+  }
+
   const getDistance = (lat1, lon1, lat2, lon2) => {
 
-    const R = 6371e3;
+    const R = 6371e3
 
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
+    const φ1 = lat1 * Math.PI / 180
+    const φ2 = lat2 * Math.PI / 180
 
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180
+    const Δλ = (lon2 - lon1) * Math.PI / 180
 
     const a =
       Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
       Math.cos(φ1) * Math.cos(φ2) *
-      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-    return R * c;
-  };
-
-
+    return R * c
+  }
 
   return (
 
@@ -179,7 +191,9 @@ useEffect(() => {
       />
 
     </RNContainer>
+
   )
+
 }
 
 export default OrderDetails

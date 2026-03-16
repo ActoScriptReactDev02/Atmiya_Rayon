@@ -7,6 +7,7 @@ import Functions from '../../utils/Functions'
 import { onAuthChange, setUserDataRedux } from '../../redux/Reducers/AuthReducers'
 import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../../theme'
 import moment from 'moment'
+import { LogoutModal } from '../../components'
 
 const Profile = () => {
 const {AsyncValue} = useSelector(state => state.Auth);
@@ -48,6 +49,7 @@ const [logoutmodal,setlogoutmodal] =useState(false);
         </View>
     </View>
     </ScrollView>
+    {logoutmodal && <LogoutModal visible={logoutmodal} onRequestClose={() => setlogoutmodal(false)} onPress={() => logoutpress()}/>}
    </RNContainer>
   )
 }

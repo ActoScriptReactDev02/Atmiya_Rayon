@@ -1,5 +1,5 @@
 import { Alert, Linking, Modal, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { RNButton, RNContainer, RNImage, RnLabelView, RNStyles, RNText } from '../../common'
 import RNHeader from '../../common/RNHeader'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,13 +10,17 @@ import { onAuthChange, setUserDataRedux } from '../../redux/Reducers/AuthReducer
 import { LogoutModal } from '../../components'
 import QRCode from 'react-native-qrcode-svg'
 import { Images } from '../../constants'
+import ReactNativeBlobUtil from "react-native-blob-util";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+
 
 const Profile = () => {
 const {AsyncValue} = useSelector(state => state.Auth);
 const dispatch = useDispatch()
 const [logoutmodal,setlogoutmodal] =useState(false);
 const [showqrcode, setshowqrcode] = useState(false)
-  const qrRef = useRef();
+const qrRef = useRef();
+
 
   const logoutpress = async () => {
     setlogoutmodal(false)
@@ -24,6 +28,41 @@ const [showqrcode, setshowqrcode] = useState(false)
      dispatch(setUserDataRedux({}));
      dispatch(onAuthChange(false));
   }
+
+const saveBase64Image = async () => {
+
+  try {
+
+    qrRef.current.toDataURL(async (base64Data) => {
+
+      console.log("base64Data:", base64Data);
+
+      const path =
+        ReactNativeBlobUtil.fs.dirs.CacheDir + "/qr_image.png";
+
+      // write base64 to file
+      await ReactNativeBlobUtil.fs.writeFile(
+        path,
+        base64Data,
+        "base64"
+      );
+
+      // save to gallery
+      const saved = await CameraRoll.save(path, { type: "photo" });
+
+      console.log("Saved:", saved);
+
+      Alert.alert("QR saved to gallery");
+
+    });
+
+  } catch (error) {
+
+    console.log("Save Error:", error);
+
+  }
+
+};
 
   
   return (
@@ -69,12 +108,13 @@ const [showqrcode, setshowqrcode] = useState(false)
         <View style={{paddingVertical:hp(7)}}>
          <QRCode      getRef={(ref) => (qrRef.current = ref)}
                       value={AsyncValue.CustomerId}
-                      size={hp(30)}
+                      size={hp(35)}
                       color={Colors.White}
                       backgroundColor={Colors.Black}
+                      quietZone={20}  
            />
            </View>
-            <RNButton title={'Download QR Code'} />
+            <RNButton onPress={() => saveBase64Image()} title={'Download QR Code'} />
             </View>
       </View>
     </Modal>
