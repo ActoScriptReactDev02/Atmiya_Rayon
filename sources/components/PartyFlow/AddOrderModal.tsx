@@ -1,67 +1,145 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
-import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../theme'
-import { RNButton, RNImage, RNStyles, RNText } from '../common'
-import { Images } from '../constants'
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
+import { RNButton, RNImage, RNInput, RNStyles, RNText, RnToast } from '../../common'
+import { Images } from '../../constants'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from 'moment';
 import ImagePicker from "react-native-image-crop-picker";
 import AddressModal from './AddressModal'
+import FetchMethod from '../../api/FetchMethod'
 
-const AddOrderModal = ({visible, onRequestClose}) => {
-    const addressOptions = [
-    { 
-      id: '1', 
-      address: 'Office No. T8-11, Nilkanth Business Hub Besides D-Mart Singanpore, Causeway Rd, Katargam, Surat',
-    },
-    { 
-      id: '2', 
-      address: '456 Business Avenue, New York, NY 10002',
-    },
-    { 
-      id: '3', 
-      address: '789 Fitness Boulevard, New York, NY 10003',
-    },
-    { 
-      id: '4', 
-      address: '321 Education Road, New York, NY 10004',
-    },
-    { 
-      id: '5', 
-      address: '654 Food Street, New York, NY 10005',
-    },
-  ];
+const AddOrderModal = ({visible, onRequestClose, addressData, onclose, toastdata, editData}) => {
+    const [isnavigate, setisnavigate] = useState(false)
     const [datepicker, setdatepicker]= useState(false);
     const [addrssmodal, setaddrssmodal] = useState(false);
-    const [selectAddress, setselectAddress] = useState(addressOptions[0])
+    const [selectAddress, setselectAddress] = useState(addressData[0])
+    const [isLoading,setisLoading] = useState(false)
     const [state, setstate] = useState({
         date:new Date(),
         imagedata:{
             uri:'',
             base64:''
         },
-        address:''
+        remark:''
     })
+    const imageerror = isnavigate && state.imagedata.base64 == ''
+    const isvalid = state.date != '' && state.imagedata.base64 != '' && Object.keys(selectAddress).length > 0;
 
-const handlegellary  = () => {
-ImagePicker.openPicker({
-//   width: 500,
-//   height: 400,
-  cropping: true,
-  includeBase64:true
-}).then((image) => {
-  setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
-});
-}
+useEffect(() => {
+  if(Object.keys(editData).length > 0){
+    setselectAddress(editData.AddressDetails),
+    setstate(p => ({...p, date: moment(editData.OrderDate, "DD MMM YYYY hh:mm A").toDate() , imagedata:{uri:editData.OrderPhoto}, remark:editData.Remark}))
+  } else{
+    setstate(p => ({...p, date:new Date(), imagedata:{base64:'',uri:''}, remark:''}))
+  }
+},[])
+
+
+const handlegellary = () => {
+  ImagePicker.openPicker({
+    cropping: true,
+    includeBase64: true
+  })
+  .then((image) => {
+    setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+  })
+  .catch((error) => {
+    console.log('handlegellary error -->', error);
+
+    if (error.code === 'E_PICKER_CANCELLED') {
+       setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+    }
+  });
+};
 
 const handlecamara = () => {
-    ImagePicker.openCamera({
-  width: 300,
-  height: 400,
-  cropping: true,
-}).then((image) => {
-  setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
-})}
+  ImagePicker.openCamera({
+    width: 300,
+    height: 400,
+    cropping: true,
+    includeBase64: true,
+  })
+  .then((image) => {
+   setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+  })
+  .catch((error) => {
+    if (error.code === 'E_PICKER_CANCELLED') {
+     setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+    } else {
+      console.log('Camera error:', error);
+    }
+  });
+};
+
+
+const handleorderadd = async () => {
+  setisnavigate(true)
+  if(isvalid){
+    setisLoading(true)
+  try{
+    const response = await FetchMethod.POST({
+      EndPoint:`Order`,
+      Params:{
+              "OrderDate": state.date,
+              "OrderPhoto": state.imagedata.base64,
+              "OrderDeliveryAddressId": selectAddress.Id,
+              "Remark": state.remark
+              }
+    })
+    if(response.ResponseCode == 0){
+     toastdata({
+      message:response.ResponseMessage,
+        Sucess:true,
+         Title:'Success'
+     })
+       onclose()
+    }
+    setisLoading(false)
+  }catch(error){
+    console.log('Order add api error -->', error);
+    onRequestClose();
+    setisLoading(false);
+     toastdata({
+      message:error?.responseMSG.Message,
+        Sucess:false,
+         Title:'Failed'
+     })
+  }
+  }
+}
+
+const handleupdate = async () => {
+  setisnavigate(true)
+  if (!isvalid) return
+  try{
+    const response = await FetchMethod.PUT({
+      EndPoint:`Order/UpdateOrder/${editData.OrderUniqueId}`,
+      Params:{
+  "OrderDate": state.date.toISOString(),
+  "OrderPhoto": state.imagedata.base64 || '',
+  "OrderDeliveryAddressId": selectAddress.Id,
+  "Remark": state.remark
+}
+    })
+    
+    if(response.ResponseCode == 0){
+       toastdata({
+      message:response.ResponseMessage,
+        Sucess:true,
+         Title:'Success'
+     })
+       onclose()
+    }
+  }catch(error){
+     setisLoading(false);
+     toastdata({
+      message:error?.responseMSG.Message,
+        Sucess:false,
+         Title:'Failed'
+     })
+  }
+}
 
 
   return (
@@ -77,7 +155,7 @@ const handlecamara = () => {
                     <RNImage source={Images.close} style={styles.iconestyle}/>
                 </Pressable>
               </View>
-              <ScrollView>
+              <ScrollView bounces={false}>
               <View style={styles.modalspace}>
                    <View style={styles.card}>
                     <View style={styles.cardHeader}>
@@ -91,6 +169,20 @@ const handlecamara = () => {
                     </TouchableOpacity>
                    </View>
                    <View style={styles.card}>
+                    <View style={styles.cardHeader}>
+                      <RNImage tintColor={'#FF6B6B'} style={styles.cardiconestyle} source={Images.Edit}/>
+                        <RNText children={'Remark'} style={styles.cardTitle}/>
+                        {/* <RNText children={'*'} style={styles.requiredStar}/> */}
+                    </View>
+                    <RNInput 
+                    value={state.remark}
+                    onChangeText={v => setstate(p => ({...p, remark:v}))}
+                    Inputwrapstyle={{marginBottom:hp(0)}} 
+                    inputStyle={{fontsize:FontSize.font16}} 
+                    placeholder={'Enter Remark'}
+                     containerStyle={styles.inputcontainerstyle} />
+                   </View>
+                   <View style={[styles.card,{borderWidth:normalize(imageerror ? 1 :0), borderColor: Colors.Red}]}>
                     <View style={styles.cardHeader}>
                         <RNImage tintColor={Colors.Blue} style={styles.cardiconestyle} source={Images.camera}/>
                         <RNText children={'Photo'} style={styles.cardTitle}/>
@@ -134,7 +226,10 @@ const handlecamara = () => {
                             <RNImage tintColor={'#4CAF50'} style={{height:wp(6), width:wp(6)}} source={Images.loaction}/>
                         </View>
                        <View style={{...RNStyles.flexRow, flex:1, columnGap:wp(1)}}>
-                         <RNText numOfLines={3} style={styles.addresstext} children={selectAddress.address}/>
+                        <View style={{flex:1}}>
+                             <RNText family={FontFamily.SemiBold} children={selectAddress.City}/>
+                           <RNText numOfLines={2} style={styles.addresstext} children={selectAddress.Address}/>
+                        </View>
                          <RNImage tintColor={Colors.Grey} style={{height:wp(4), width:wp(4),transform: [
                           {
                             rotate:'180deg',
@@ -143,7 +238,9 @@ const handlecamara = () => {
                        </View>
                     </TouchableOpacity>
                    </View>
-                    <RNButton btnstyles={{marginTop:hp(0), marginBottom: hp(2)}} title={'Save'}/>
+                  {isLoading ? <View style={styles.btnloaderstyle}>
+                    <ActivityIndicator size={'small'} color={Colors.White}/>
+                  </View> :<RNButton  onPress={() => Object.keys(editData).length >0 ? handleupdate() : handleorderadd()} btnstyles={{marginTop:hp(0), marginBottom: hp(2)}} title={'Save'}/> }
               </View>
               </ScrollView>
          </View>
@@ -151,7 +248,8 @@ const handlecamara = () => {
        onCancel={() => setdatepicker(false)}
        onConfirm={(v) => {setstate(p => ({...p, date:v})), setdatepicker(false)}}
        />}
-       {addrssmodal && <AddressModal selectaddress={(data) => {setselectAddress(data), setaddrssmodal(false)} } onRequestClose={() => setaddrssmodal(false)} visible={addrssmodal} data={addressOptions}/>}
+      
+       {addrssmodal && <AddressModal selectaddress={(data) => {setselectAddress(data), setaddrssmodal(false)} } onRequestClose={() => setaddrssmodal(false)} visible={addrssmodal} data={addressData}/>}
         </View>
     </Modal>
   )
@@ -297,5 +395,20 @@ const styles = StyleSheet.create({
  addresstext:{
     fontSize:FontSize.font13,
     flex:1
+ },
+ inputcontainerstyle:{
+  backgroundColor: '#f8f8f8',
+   borderWidth: 1,
+  borderColor: '#eee',
+  borderRadius:normalize(10),
+  height: hp(5.5),
+ },
+ btnloaderstyle:{
+  backgroundColor:Colors.Orange,
+    width:wp(90),
+    alignItems:'center',
+    paddingVertical:hp(1.8),
+    borderRadius:normalize(10),
+    marginBottom: hp(2)
  }
 })

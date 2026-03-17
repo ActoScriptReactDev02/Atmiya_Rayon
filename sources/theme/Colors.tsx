@@ -9,7 +9,8 @@ const Colors = {
   DarkBackgroundColor:'#FFC3A8',
   BorderColor:'#D0D0D0',
   Transparent: 'transparent',
-  Red:'#e63d3d'
+  Red:'#e63d3d',
+  Green:'#44b678'
 };
 
 export default Colors;

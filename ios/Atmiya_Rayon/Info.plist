@@ -26,6 +26,15 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+<string>This app needs camera access to scan QR codes.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location for delivery tracking</string>
+
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>We need your location for delivery tracking</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+<string>We need permission to save QR code to your Photos</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

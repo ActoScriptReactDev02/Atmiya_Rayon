@@ -1,4 +1,4 @@
-const BASE_URL = '';
+const BASE_URL = 'https://aatmiyaapi.actoscript.com';
 const LIVE_URL = '';
 
 const URL = {

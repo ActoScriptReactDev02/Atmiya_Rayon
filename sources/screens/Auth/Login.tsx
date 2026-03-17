@@ -1,30 +1,89 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import { RNButton, RNContainer, RnImagesCard, RNInput, RNStyles, RNText } from '../../common'
+import { RNButton, RNContainer, RnImagesCard, RNInput, RNStyles, RNText, RnToast } from '../../common'
 import { Images } from '../../constants'
 import { Colors, FontFamily, FontSize, hp } from '../../theme'
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useDispatch } from 'react-redux'
-import { onAuthChange } from '../../redux/Reducers/AuthReducers'
+import { onAuthChange, setUserDataRedux } from '../../redux/Reducers/AuthReducers'
+import FetchMethod from '../../api/FetchMethod'
+import Functions from '../../utils/Functions'
 
 
 const Login = () => {
-  const [state, setstate] = useState({
+  const [state, setstate] = useState({  
     username:'',
     password:''
   })
   const distpatch = useDispatch()
   const [secureText, SetsecureText] = useState(true);
   const [isnavigate, setisnavigate] = useState(false);
+  const [isLoading, SetisLoading] = useState(false);
+  const [showtoast,Setshowtoast] = useState({
+    isShow:false,
+    message:'',
+    Sucess:false,
+    Title:''
+  })
 const nameerror = isnavigate && state.username.length < 2;
-const passworderror = isnavigate && state.password.length < 6
-  const handlelogin = () => {
-    setisnavigate(true);
-    distpatch(onAuthChange(true))
+const passworderror = isnavigate && state.password.length < 4
+const isvalid = isnavigate && state.password.length >4 && state.username.length > 2
+
+
+  const handlelogin = async () => {
+    try{
+      setisnavigate(true);
+      if(isvalid){
+        SetisLoading(true);
+      const response = await FetchMethod.POST({
+        EndPoint:'Login',
+        Params:{
+              "UserName": state.username,
+              "Password": state.password
+       }
+      });
+     console.log('response',response);
+      
+      if(response.ResponseCode == 0){
+        await Functions.setUserData(response);
+        distpatch(setUserDataRedux(response));
+        distpatch(onAuthChange(true));
+        handletoast(response.ResponseMessage,true,'Success')
+      } else{
+        distpatch(onAuthChange(false))
+          handletoast(response.ResponseMessage,false,'Success')
+      }
+    }
+     SetisLoading(false);
+  }catch(error){
+    console.log('Login api error --->',error);
+     SetisLoading(false);
+        if(error.responseMSG.Message){
+          handletoast(error?.responseMSG.Message,false,'Login failed.')
+        }
+     }
+  }
+
+  const handletoast = (messge,issuccess,title) => {
+   //console.log('data',messge,issuccess,title);
+      Setshowtoast({
+              isShow: true,
+              Sucess: issuccess,
+              Title: title,
+              message: messge,
+            });
+            setTimeout(() => {
+              Setshowtoast({
+                isShow: false,
+                Sucess: '',
+                Title: '',
+                message: '',
+              });
+            }, 2000);
   }
   
   return (
-   <RNContainer>
+   <RNContainer isLoading={isLoading}>
     <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
    <View style={styles.continer}>
     <View style={{...RNStyles.center}}>
@@ -41,6 +100,7 @@ const passworderror = isnavigate && state.password.length < 6
     <RNButton onPress={() => handlelogin()} title={'Sign In'}/>
    </View>
    </KeyboardAwareScrollView>
+   {showtoast.isShow && <RnToast Message={showtoast.message} isSuccess={showtoast.Sucess} Title={showtoast.Title}/>}
    </RNContainer>
   )
 }

@@ -42,11 +42,12 @@ const RNInput = React.forwardRef((props, ref) => {
     contextMenuHidden,
     rightBtnDisable,
     errormessage,
-    error
+    error,
+    Inputwrapstyle
   } = props;
 
   return (
-    <View style={{ marginBottom:hp(2.5)}}>
+    <View style={[{ marginBottom:hp(2.5)},Inputwrapstyle]}>
     <View style={[styles.inputContainer, containerStyle]}>
       {leftIconSource && (
         <View style={[leftContainerStyle,{...RNStyles.flexRow, columnGap:wp(2)}]}>
