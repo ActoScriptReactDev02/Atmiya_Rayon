@@ -7,6 +7,8 @@ import { Images } from '../../constants'
 import ImagePicker from "react-native-image-crop-picker";
 import { Pressable } from 'react-native-gesture-handler'
 import FetchMethod from '../../api/FetchMethod'
+import { useNavigation } from '@react-navigation/native'
+import { NavRoutes } from '../../navigation'
 
 const ScanOrder = ({route}) => {
   const [data,setdata] = useState(route.params.Data);
@@ -23,6 +25,7 @@ const ScanOrder = ({route}) => {
     Sucess:false,
     Title:''
   })
+  const navigation = useNavigation()
 
   
   const handlecamara = () => {
@@ -87,7 +90,6 @@ const UpdateOrderDeliveryStatus = async () =>{
     console.log('response',response);
     if(response.ResponseCode == 0){
       console.log('data[0].OrderUniqueId',data[0].OrderUniqueId);
-      
     setdata((prev) =>
           prev.map((item) =>
             item.OrderUniqueId === response.data[0].OrderUniqueId
@@ -96,6 +98,7 @@ const UpdateOrderDeliveryStatus = async () =>{
           ),)
          onRequestClose();
          handletoast(true,'Order Delivered',response.ResponseMessage)
+         navigation.navigate(NavRoutes.TRIPDETAILS)
     } else{
       handletoast(false,'Order Failed',response.ResponseMessage)
     }

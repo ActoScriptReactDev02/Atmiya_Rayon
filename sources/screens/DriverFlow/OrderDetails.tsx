@@ -41,10 +41,10 @@ const locations = [
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-      title: "Location Permission",
-      message: "App needs location access",
-      buttonPositive: "OK",
-    }
+          title: "Location Permission",
+          message: "App needs location access",
+          buttonPositive: "OK",
+        }
       )
 
       return granted === PermissionsAndroid.RESULTS.GRANTED
@@ -54,6 +54,7 @@ const locations = [
   }
 
   const openGoogleMap = () => {
+    const navigation = useNavigation()
     setNavigationStarted(true);   // START TRACKING
     const origin = `${locations[0].lat},${locations[0].lng}`
 
@@ -65,15 +66,12 @@ const locations = [
       .join("|")
 
     const url =
-      `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}`
+      `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}&travelmode=driving`
       console.log('url',url);
-      
-
-    Linking.openURL(url)
-  }
+      Linking.openURL(url)
+  } 
 
   useEffect(() => {
-
     const startTracking = async () => {
 
       const granted = await requestLocationPermission()
@@ -81,14 +79,13 @@ const locations = [
     console.log("Permission denied");
     return;
   }
-
       watchId.current = Geolocation.watchPosition(
 
         (position) => {
 
           const { latitude, longitude } = position.coords
 
-          console.log("Driver Location:", latitude, longitude)
+        //  console.log("Driver Location:", latitude, longitude)
 
           checkLocation(latitude, longitude)
 
@@ -121,8 +118,7 @@ const locations = [
   }, [currentStopIndex])
 
   const checkLocation = (lat, lng) => {
-
-    if (!navigationStarted) return;  // ❗IMPORTANT
+    if (!navigationStarted) return;  
     if (isNavigating) return
 
     const target = locations[currentStopIndex]
@@ -170,20 +166,18 @@ const locations = [
   return (
 
     <RNContainer>
-
       <RNHeader
         title={'Order Details'}
-        righticonesource={Images.scanner}
-        onRightPress={() => navigation.navigate(NavRoutes.SCAN)}
+        // righticonesource={Images.scanner}
+        // onRightPress={() => navigation.navigate(NavRoutes.SCAN)}
       />
 
       <FlatList
         data={data}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-
           <OrderItemView
-            onPress={openGoogleMap}
+            onPress={() => navigation.navigate(NavRoutes.TRIPDETAILS,{CustomerId:item.CustomerId})}
             item={item}
           />
 

@@ -11,7 +11,8 @@
     DRIVERORDERDETAILS:'Driver Order Details',
     SCAN:'Scanner',
     SCANORDER:'Scan Order Details',
-    TRIP:'Start Trip'
+    TRIP:'Start Trip',
+    TRIPDETAILS:'Trip Details'
  }
 
  export default NavRoutes

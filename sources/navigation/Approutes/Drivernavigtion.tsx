@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
 import NavRoutes from '../NavRoutes';
-import { Orderdetails, OrderHistory, Profile, Scan, ScanOrder } from '../../screens/DriverFlow';
+import { Orderdetails, OrderHistory, Profile, Scan, ScanOrder, TripDetails } from '../../screens/DriverFlow';
 const Stack = createStackNavigator()
 
 const Drivernavigtion = () => {
@@ -13,6 +13,7 @@ const Drivernavigtion = () => {
         <Stack.Screen component={Orderdetails} name={NavRoutes.DRIVERORDERDETAILS}/>
         <Stack.Screen component={Scan} name={NavRoutes.SCAN}/>
         <Stack.Screen component={ScanOrder} name={NavRoutes.SCANORDER}/>
+        <Stack.Screen component={TripDetails} name={NavRoutes.TRIPDETAILS}/>
     </Stack.Navigator>
   )
 }
