@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 import {Colors, FontFamily, FontSize, hp, normalize, wp} from '../theme';
 import RNImage from './RNImage';
 import RNText from './RNText';
@@ -43,7 +43,8 @@ const RNInput = React.forwardRef((props, ref) => {
     rightBtnDisable,
     errormessage,
     error,
-    Inputwrapstyle
+    Inputwrapstyle,
+    rightloader
   } = props;
 
   return (
@@ -74,7 +75,7 @@ const RNInput = React.forwardRef((props, ref) => {
         onEndEditing={onEndEditing}
         onFocus={onFocus}
         onBlur={onBlur}
-        keyboardType={keyboardType}
+        keyboardType={keyboardType || 'default'}
         returnKeyType={returnKeyType}
         secureTextEntry={secureTextEntry}
         textAlign={textAlign}
@@ -99,6 +100,9 @@ const RNInput = React.forwardRef((props, ref) => {
             style={[styles.icon, rightIconStyle]}
           />
         </TouchableOpacity>
+      )}
+      {rightloader && (
+        <ActivityIndicator size={'small'} color={Colors.Orange}/>
       )}
     </View>
     {error && <RNText style={styles.errortextstyle} children={errormessage}/>}

@@ -1,4 +1,4 @@
-import { FlatList, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { RNButton, RNContainer, RNImage, RNStyles, RNText } from '../../common'
 import RNHeader from '../../common/RNHeader'
@@ -15,23 +15,12 @@ const TripDetails = ({route}) => {
  const CustomerId = route.params.CustomerId
  const [data,setdata] = useState([])
  const [isloding, setisloding] = useState(false)
- const tripLocations = [
-  // { name: 'Actoscript', latitude: 21.2235428, longitude: 72.8064407 },
-    { name: 'Kantheriya Hanuman Chowk', latitude: 21.22539, longitude: 72.8068017 },
-    { name: 'Dabholi', latitude: 21.2339, longitude: 72.8117 },
-    { name: 'Gajera Circle', latitude: 21.2145, longitude: 72.8656 },
-    { name: 'Varachha', latitude: 21.2209, longitude: 72.8733 }
-  ];
-
-  const [selectTrip, setselectTrip] = useState(tripLocations[0]);
+  const [selectTrip, setselectTrip] = useState(null);
  const navigation = useNavigation();
- // refs to control tracking
   const watchId = useRef(null);
   const hasNavigated = useRef(false);
-
-  // static locations for map preview
+  console.log('route.params',route.params.IsQrScan);
   
-  const [locations] = useState(tripLocations);
 
   useEffect(() => {
     GetCustomerOrderDetails();  
@@ -50,6 +39,25 @@ const TripDetails = ({route}) => {
     }
   }, [selectTrip]);
 
+   const requestLocationPermission = async () => {
+  
+      if (Platform.OS === "android") {
+  
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+            title: "Location Permission",
+            message: "App needs location access",
+            buttonPositive: "OK",
+          }
+        )
+  
+        return granted === PermissionsAndroid.RESULTS.GRANTED
+      }
+  
+      return true
+    }
+
   // distance formula
   const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
     const R = 6371000;
@@ -61,8 +69,8 @@ const TripDetails = ({route}) => {
     const a =
       Math.sin(dLat / 2) ** 2 +
       Math.cos(toRad(lat1)) *
-        Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) ** 2;
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -71,20 +79,23 @@ const TripDetails = ({route}) => {
 
   // get destination from selected order
   const getCurrentDestination = () => {
-      //console.log('selectTrip?.latitude',selectTrip);
-    if (selectTrip?.latitude && selectTrip?.longitude) {
+    if (selectTrip?.location?.latitude && selectTrip?.location?.longitude) {
       return {
-        latitude: selectTrip.latitude,
-        longitude: selectTrip.longitude
+        latitude: parseFloat(selectTrip?.location?.latitude),
+        longitude: parseFloat(selectTrip?.location?.longitude)
       };
     }
     return null;
   };
 
   // start location tracking
-  const startTracking = () => {
+  const startTracking = async () => {
+     const granted = await requestLocationPermission()
+      if (!granted) {
+        console.log("Permission denied");
+    return;
+  }
     hasNavigated.current = false;
-
     watchId.current = Geolocation.watchPosition(
       position => {
         const { latitude, longitude } = position.coords;
@@ -99,19 +110,17 @@ const TripDetails = ({route}) => {
           destination.longitude
         );
 
-        console.log('Distance:', distance);
+       // console.log('Distance:', distance);
 
         if (distance < 50 && !hasNavigated.current) {
           hasNavigated.current = true;
-
           console.log('Reached destination ✅');
 
           // stop tracking
           if (watchId.current !== null) {
             Geolocation.clearWatch(watchId.current);
           }
-
-          navigation.navigate(NavRoutes.SCAN);
+          handlenavigate()
         }
       },
       error => console.log(error),
@@ -128,33 +137,42 @@ const TripDetails = ({route}) => {
   const openMap = () => {
     const destination = getCurrentDestination();
     console.log('destination',destination);
-    
     if (!destination) return;
 
     const url = `https://www.google.com/maps/dir/?api=1&destination=${destination.latitude},${destination.longitude}&travelmode=driving`;
+     console.log('url',url);
 
     Linking.openURL(url);
   };
 
+  const handlenavigate = () =>{
+    if(route.params.IsQrScan){
+        navigation.navigate(NavRoutes.SCAN)} 
+    else{
+        navigation.navigate(NavRoutes.SCANORDER,{Data:data, CustomerId:CustomerId})
+      }
+  }
+
   // API call
   const GetCustomerOrderDetails = async () => {
+    
     try {
       setisloding(true);
 
       const response = await FetchMethod.GET({
         EndPoint: `TripMaster/GetCustomerOrderDetails?CustomerId=${CustomerId}`
       });
+console.log('response',response);
 
       if (response.length > 0) {
         setdata(response);
-       
-        // const firstPending = response.find(
-        //   item => item.IsDelivered === false
-        // );
-
-        // if (firstPending) {
-        //   setselectTrip(firstPending);
-        // }
+        const firstPending = response.find(
+          item => item.IsDelivered === false
+        );
+         
+        if (firstPending) {
+          setselectTrip(firstPending);
+        }
       } else {
         setdata([]);
       }
@@ -162,7 +180,7 @@ const TripDetails = ({route}) => {
       setisloding(false);
     } catch (error) {
       setisloding(false);
-      console.log('API Error -->', error);
+      console.log('GetCustomerOrderDetails Error -->', error);
     }
   };
 
@@ -172,38 +190,51 @@ const TripDetails = ({route}) => {
         <RNHeader title={'Order'}/>
         </View>
         <View style={{height:hp(40)}}>
-      <MapView
-      showsUserLocation={true}
-        style={{ flex: 1 }}
-        initialRegion={{
-          latitude: locations[0].latitude,
-          longitude: locations[0].longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05
+     <MapView
+  showsUserLocation={true}
+  style={{ flex: 1 }}
+  initialRegion={{
+    latitude: parseFloat(data[0]?.location?.latitude) || 21.22539,
+    longitude: parseFloat(data[0]?.location?.longitude) || 72.8068,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  }}
+>
+  {data.map((loc, index) => {
+    const lat = parseFloat(loc.location?.latitude);
+    const lng = parseFloat(loc.location?.longitude);
+
+    // Skip invalid coordinates
+    if (!lat || !lng) return null;
+
+    return (
+      <Marker
+        key={loc.OrderUniqueId || index}
+        coordinate={{
+          latitude: lat,
+          longitude: lng,
         }}
       >
-        {locations.map((loc, index) => (
-  <Marker
-    key={index}
-    coordinate={{
-      latitude: loc.latitude,
-      longitude: loc.longitude
-    }}
-  >
-    <View style={{ alignItems: "center" }}>
-      <View
-        style={styles.labelstyle}>
-        <Text style={{ fontSize: 12, fontWeight: "600" }}>
-          {index + 1 +'. ' +loc.name}
-        </Text>
-      </View>
-      <View>
-        <RNImage tintColor={Colors.Orange} style={{height:wp(8), width:wp(8)}} source={Images.loaction}/>
-      </View>
-    </View>
-  </Marker>
-   ))}
-      </MapView>
+        <View style={{ alignItems: "center" }}>
+          
+          {/* Label */}
+          <View style={styles.labelstyle}>
+            <Text style={{ fontSize: 12, fontWeight: "600" }}>
+              {`${index + 1}. ${loc.location?.name}`}
+            </Text>
+          </View>
+
+          {/* Icon */}
+          <RNImage
+            tintColor={Colors.Orange}
+            style={{ height: wp(8), width: wp(8) }}
+            source={Images.loaction}
+          />
+        </View>
+      </Marker>
+    );
+  })}
+</MapView>
       
       </View>
       <FlatList contentContainerStyle={styles.contentcontainersyle} data={data} renderItem={({item,index}) => (
@@ -213,7 +244,7 @@ const TripDetails = ({route}) => {
             <View style={{position:'absolute', right:wp(2)}}>
              {item.IsDelivered ?  <RNText family={FontFamily.SemiBold} color={item.IsDelivered ? Colors.Green :Colors.Orange} 
               children={item.IsDelivered ? 'Delivered' :'Pending⏳'}/> :
-              <Pressable hitSlop={20} onPress={() => navigation.navigate(NavRoutes.SCAN)}>
+              <Pressable hitSlop={20} onPress={() => handlenavigate()}>
                 <RNImage tintColor={Colors.Orange} style={{height:wp(5.5), width:wp(5.5)}} source={Images.scanner}/>
               </Pressable>}
               </View>
@@ -238,7 +269,7 @@ const TripDetails = ({route}) => {
         </View>
       )}
       />
-      <RNButton onPress={() => openMap()} btnstyles={{marginTop:hp(1), alignSelf:'center'}} title={'Start trip'}/>
+     {selectTrip != null &&  <RNButton onPress={() => openMap()} btnstyles={{marginTop:hp(1), alignSelf:'center'}} title={'Start trip'}/>}
     </RNContainer>
   )
 }

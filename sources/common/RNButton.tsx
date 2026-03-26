@@ -1,12 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import RNText from './RNText'
 import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../theme'
 
-const RNButton = ({title,onPress,btnstyles,btntextstyle,disabled}) => {
+const RNButton = ({title,onPress,btnstyles,btntextstyle,disabled, isloding}) => {
   return (
     <Pressable disabled={disabled} onPress={onPress} style={[styles.btnstyle,btnstyles]}>
-    <RNText children={title} style={[styles.textstyle,btntextstyle]}/>
+   {isloding ? <ActivityIndicator size={'small'} color={Colors.White}/> : <RNText children={title} style={[styles.textstyle,btntextstyle]}/>}
     </Pressable>
   )
 }

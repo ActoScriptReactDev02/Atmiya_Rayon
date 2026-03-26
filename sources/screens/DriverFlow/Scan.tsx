@@ -47,7 +47,7 @@ const scandata = async (value) => {
     
     if(response.length >0){
       setIsActive(false)
-       navigtion.navigate(NavRoutes.SCANORDER,{Data:response})
+       navigtion.navigate(NavRoutes.SCANORDER,{Data:response, CustomerId:value})
     }
   }catch(error){
     navigtion.goBack()

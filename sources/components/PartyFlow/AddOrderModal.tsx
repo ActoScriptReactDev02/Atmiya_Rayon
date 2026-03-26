@@ -8,12 +8,13 @@ import moment from 'moment';
 import ImagePicker from "react-native-image-crop-picker";
 import AddressModal from './AddressModal'
 import FetchMethod from '../../api/FetchMethod'
+import RNHeader from '../../common/RNHeader'
 
 const AddOrderModal = ({visible, onRequestClose, addressData, onclose, toastdata, editData}) => {
     const [isnavigate, setisnavigate] = useState(false)
     const [datepicker, setdatepicker]= useState(false);
     const [addrssmodal, setaddrssmodal] = useState(false);
-    const [selectAddress, setselectAddress] = useState(addressData[0])
+    const [selectAddress, setselectAddress] = useState(addressData)
     const [isLoading,setisLoading] = useState(false)
     const [state, setstate] = useState({
         date:new Date(),
@@ -145,8 +146,11 @@ const handleupdate = async () => {
   return (
     <Modal  statusBarTranslucent={true} visible={visible} transparent animationType='slide'>
         <View style={styles.modalcontiner}>
-         <View style={styles.modalwrapstyle}>
-              <View style={[styles.modalspace,styles.modalhederstyle]}>
+        
+          <RNHeader  onLeftPress={() => onRequestClose()} 
+          title={Object.keys(editData).length >0 ? 'Modify Order':'Add New Order'}
+          />
+              {/* <View style={[styles.modalspace,styles.modalhederstyle]}>
                 <View>
                     <RNText style={styles.hedeartitlestyle} children={'Add Order'}/>
                     <RNText color={Colors.Grey} children={'Fill in the details below'}/>
@@ -154,9 +158,9 @@ const handleupdate = async () => {
                 <Pressable onPress={() => onRequestClose()}>
                     <RNImage source={Images.close} style={styles.iconestyle}/>
                 </Pressable>
-              </View>
-              <ScrollView bounces={false}>
-              <View style={styles.modalspace}>
+              </View> */}
+              <ScrollView contentContainerStyle={{flexGrow:1}} bounces={false}>
+              <View style={{flex:1,}}>
                    <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <RNImage tintColor={'#FF6B6B'} style={styles.cardiconestyle} source={Images.date}/>
@@ -182,7 +186,7 @@ const handleupdate = async () => {
                     placeholder={'Enter Remark'}
                      containerStyle={styles.inputcontainerstyle} />
                    </View>
-                   <View style={[styles.card,{borderWidth:normalize(imageerror ? 1 :0), borderColor: Colors.Red}]}>
+                   <View style={[styles.card,{borderWidth: imageerror ? normalize(1) : 0.4, borderColor: imageerror ? Colors.Orange : Colors.Red}]}>
                     <View style={styles.cardHeader}>
                         <RNImage tintColor={Colors.Blue} style={styles.cardiconestyle} source={Images.camera}/>
                         <RNText children={'Photo'} style={styles.cardTitle}/>
@@ -199,6 +203,7 @@ const handleupdate = async () => {
                       <RNText children={'Change Photo'} style={styles.changePhotoText}/>
                     </TouchableOpacity>
                   </View> :
+                  <>
                  <View style={styles.photoOptions}>
                     <TouchableOpacity onPress={()=> handlecamara()}
                       style={[styles.photoOption, styles.cameraOption]} 
@@ -213,7 +218,9 @@ const handleupdate = async () => {
                        <RNImage tintColor={Colors.White} style={styles.cardiconestyle} source={Images.gallery}/>
                       <RNText children={'Choose from Gallery'} style={styles.photoOptionText}/>
                     </TouchableOpacity>
-                  </View>}
+                  </View>
+                 {imageerror && <RNText pTop={hp(1)} children={'**Please upload order photos'} color={Colors.Red} size={FontSize.font12}/>}
+                  </>}
                    </View>
                    <View style={styles.card}>
                     <View style={styles.cardHeader}>
@@ -227,8 +234,8 @@ const handleupdate = async () => {
                         </View>
                        <View style={{...RNStyles.flexRow, flex:1, columnGap:wp(1)}}>
                         <View style={{flex:1}}>
-                             <RNText family={FontFamily.SemiBold} children={selectAddress.City}/>
-                           <RNText numOfLines={2} style={styles.addresstext} children={selectAddress.Address}/>
+                             <RNText family={FontFamily.SemiBold} children={selectAddress?.City}/>
+                           <RNText numOfLines={2} style={styles.addresstext} children={selectAddress?.Address}/>
                         </View>
                          <RNImage tintColor={Colors.Grey} style={{height:wp(4), width:wp(4),transform: [
                           {
@@ -238,18 +245,19 @@ const handleupdate = async () => {
                        </View>
                     </TouchableOpacity>
                    </View>
-                  {isLoading ? <View style={styles.btnloaderstyle}>
+                  {/* {isLoading ? <View style={styles.btnloaderstyle}>
                     <ActivityIndicator size={'small'} color={Colors.White}/>
-                  </View> :<RNButton  onPress={() => Object.keys(editData).length >0 ? handleupdate() : handleorderadd()} btnstyles={{marginTop:hp(0), marginBottom: hp(2)}} title={'Save'}/> }
+                  </View> :<RNButton  onPress={() => Object.keys(editData).length >0 ? handleupdate() : handleorderadd()} btnstyles={{marginTop:hp(0), marginBottom: hp(2)}} title={'Save'}/> } */}
               </View>
               </ScrollView>
-         </View>
+              <RNButton isloding={isLoading} disabled={isLoading}  onPress={() => Object.keys(editData).length >0 ? handleupdate() : handleorderadd()} btnstyles={{marginTop:hp(0), marginBottom: hp(2)}} title={'Save'}/> 
+        
        {datepicker && <DateTimePickerModal  isVisible={datepicker}  mode='date' value={state.date.toISOString()} 
        onCancel={() => setdatepicker(false)}
        onConfirm={(v) => {setstate(p => ({...p, date:v})), setdatepicker(false)}}
        />}
       
-       {addrssmodal && <AddressModal selectaddress={(data) => {setselectAddress(data), setaddrssmodal(false)} } onRequestClose={() => setaddrssmodal(false)} visible={addrssmodal} data={addressData}/>}
+       {addrssmodal && <AddressModal selectaddress={(data) => {setselectAddress(data), setaddrssmodal(false)} } onRequestClose={() => setaddrssmodal(false)} visible={addrssmodal}/>}
         </View>
     </Modal>
   )
@@ -260,17 +268,21 @@ export default AddOrderModal
 const styles = StyleSheet.create({
     modalcontiner:{
         flex:1,
-        backgroundColor:'#00000056',
-        justifyContent:'flex-end'
+         backgroundColor:Colors.White,
+         paddingTop:hp(5),
+         paddingHorizontal:wp(4),
+         paddingBottom:hp(2)
+        // backgroundColor:'#00000056',
+        // justifyContent:'flex-end'
     }, modalwrapstyle:{
-       height:hp(80),
-        backgroundColor:Colors.White,
-        borderTopLeftRadius:normalize(20),
-        borderTopRightRadius:normalize(20)
+       // height:hp(80),
+       // backgroundColor:Colors.White,
+        // borderTopLeftRadius:normalize(20),
+        // borderTopRightRadius:normalize(20),
     },
     modalspace:{
-        paddingHorizontal:wp(4),
-        paddingVertical:hp(2.2),
+        // paddingHorizontal:wp(4),
+        // paddingVertical:hp(2.2),
     },
     modalhederstyle:{
         borderBottomWidth:normalize(1),
@@ -287,6 +299,7 @@ const styles = StyleSheet.create({
         width:wp(8),
     },
     card: {
+    flex:1,
     backgroundColor: Colors.White,
     borderRadius: normalize(8),
     shadowColor: '#000',
@@ -296,10 +309,12 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
-    elevation: 4,
+    elevation: 1,
     paddingHorizontal:wp(4),
     paddingVertical:wp(3),
     marginBottom:hp(3),
+    borderWidth:0.4,
+    borderColor:Colors.Orange
   },
   cardHeader: {
     flexDirection: 'row',

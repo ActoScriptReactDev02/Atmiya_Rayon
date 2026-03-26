@@ -27,7 +27,7 @@ const [logoutmodal,setlogoutmodal] =useState(false);
     <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
          <View style={{paddingHorizontal:wp(2)}}>
         <View style={styles.profileimagewrapstyle}>
-          <RNImage resizeMode={'cover'} ImageUri={'https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHVzZXJ8ZW58MHx8MHx8fDA%3D'||AsyncValue.Image} style={styles.imagestyle}/>
+          <RNImage resizeMode={'cover'} ImageUri={AsyncValue.Image} style={styles.imagestyle}/>
           <RNText style={styles.titlestyle} children={AsyncValue.FirstName + ' ' + AsyncValue.LastName}/>
           <RNText pTop={hp(0.5)} children={AsyncValue.MobileNo}/>
         </View>

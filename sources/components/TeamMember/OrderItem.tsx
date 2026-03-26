@@ -6,13 +6,23 @@ import { Images } from '../../constants'
 
 const OrderItem = ({items,onPress,orderimagepress}) => {
   return (
-    <Pressable disabled={items.IsReadyforDelivery} onPress={onPress} style={[styles.card]}>
+    <View  style={[styles.card]}>
       <View style={[styles.headerstyle,styles.cardspace]}>
         <View style={styles.mainwrapstyle}>
     <RNText children={items.OrderCode} family={FontFamily.SemiBold} size={FontSize.font14}/>
-    <View style={[styles.orderflagstyle,{ borderColor:items.IsReadyforDelivery ?'rgb(52 168 84)' : Colors.Red ,backgroundColor:items.IsReadyforDelivery ? 'rgba(52, 168, 85, 0.2)': Colors.Red + '20'}]}>
+         {/* <View style={[styles.orderflagstyle,{ borderColor:items.IsReadyforDelivery ?'rgb(52 168 84)' : Colors.Red ,backgroundColor:items.IsReadyforDelivery ? 'rgba(52, 168, 85, 0.2)': Colors.Red + '20'}]}>
                  <RNText family={FontFamily.Medium} color={items.IsReadyforDelivery?'rgb(52 168 84)' : Colors.Red} size={FontSize.font11} pTop={hp(0.2)} numOfLines={1}  children={items.IsReadyforDelivery ? 'Confirm' : 'Pending'}/>
+              </View> */}
+              {items.IsReadyforDelivery ?
+              <View style={{...RNStyles.flexRow, columnGap:wp(2)}}>
+                <RNImage tintColor={Colors.Green} source={Images.successicone} style={styles.iconestyle}/>
+                 <RNText style={styles.orderflagtextstyle} color={Colors.Green}  numOfLines={1}  children={ 'Order Confirmed'}/>
               </View>
+               : <Pressable disabled={items.IsReadyforDelivery} onPress={onPress} style={{...RNStyles.flexRow, columnGap:wp(2)}}>
+                {/* <RNImage tintColor={Colors.Orange} source={Images.successicone} style={styles.iconestyle}/> */}
+                 <View style={styles.checkstyle}/>
+                <RNText color={Colors.Orange} style={styles.orderflagtextstyle}  children={'Order Completed'}/>
+            </Pressable>}
         </View>
 
       </View>
@@ -42,8 +52,7 @@ const OrderItem = ({items,onPress,orderimagepress}) => {
               </View>
            </View>
          </View>
-     
-    </Pressable>
+    </View>
   )
 }
 
@@ -99,5 +108,17 @@ const styles = StyleSheet.create({
     },
     mainwrapstyle:{
       ...RNStyles.flexRowBetween
+    },
+     checkstyle:{
+        height:wp(4),
+        width:wp(4),
+        borderWidth:1,
+        borderRadius:normalize(4),
+        borderColor:Colors.Orange
+    },
+    orderflagtextstyle:{
+      fontSize:FontSize.font13,
+      fontFamily:FontFamily.SemiBold,
+      paddingTop:hp(0.3)
     }
 })

@@ -8,4 +8,5 @@ export{default as RNStyles} from './RNStyles';
 export{default as RNInput} from './RNInput';
 export{default as RNLoader} from './RNLoader';
 export{default as RnToast} from './RnToast';
-export{default as RnLabelView} from'./RnLabelView'
+export{default as RnLabelView} from'./RnLabelView';
+export{default as RnlabelInput} from'./RnlabelInput'

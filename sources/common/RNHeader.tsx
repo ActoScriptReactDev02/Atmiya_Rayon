@@ -17,9 +17,9 @@ const RNHeader = ({title, backarrowshow,onLeftPress,onRightPress,righticonesourc
          <RNImage source={Images.backarrow} style={styles.iconestyle}/>
         </TouchableOpacity>}
      <RNText numOfLines={1} style={styles.titlestyle} children={title}/>
-     <TouchableOpacity onPress={onRightPress} style={[styles.imagerapstyle,{backgroundColor:Colors.Orange + '20'}]}>
-        <RNImage source={righticonesource || Images.notification} style={styles.iconestyle}/>
-     </TouchableOpacity>
+    { righticonesource ? <TouchableOpacity onPress={onRightPress} style={[styles.imagerapstyle,{backgroundColor:Colors.Orange + '20'}]}>
+        <RNImage source={righticonesource } style={styles.iconestyle}/>
+     </TouchableOpacity> : <View style={styles.imagerapstyle}/>}
     </View>
   )
 }

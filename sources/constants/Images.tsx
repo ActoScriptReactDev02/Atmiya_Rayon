@@ -32,7 +32,10 @@ const Images ={
     DeliveryDone:require(ImagePath + 'deliveryDone' + png),
     DeliveryPending:require(ImagePath + 'deliveryPending' + png),
     doneicone:require(Iconepath + 'done' + png),
-    rightback:require(Iconepath + 'rightback' + png)
+    rightback:require(Iconepath + 'rightback' + png),
+    search:require(Iconepath + 'search' + png),
+    warning:require(Iconepath + 'warning' + png),
+    dealy:require(Iconepath + 'dealy' + png)
 }
 
 export default Images

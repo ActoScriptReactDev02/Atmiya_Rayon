@@ -1,4 +1,4 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { RNContainer, RNImage, RNStyles, RNText } from '../../common'
 import RNHeader from '../../common/RNHeader'
@@ -6,13 +6,16 @@ import FetchMethod from '../../api/FetchMethod'
 import { OrderItemView } from '../../components/DriverFlow'
 import { useNavigation } from '@react-navigation/native'
 import { NavRoutes } from '../../navigation'
-import { Colors, FontSize, hp, normalize, wp } from '../../theme'
+import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../../theme'
 import { Images } from '../../constants'
+import LottieView from 'lottie-react-native'
 
 const OrderHistory = () => {
   const [data, setdata] = useState([])
   const [isloading, setisloading] = useState(false)
   const navigation = useNavigation()
+     const [refreshing, setRefreshing] = useState(false);
+  
 
 useEffect(() => {
  GetTripDetails()
@@ -24,8 +27,6 @@ useEffect(() => {
      const response = await FetchMethod.GET({
       EndPoint:`TripMaster/GetTripDetails`
      })
-
-    // console.log('response',response);
      if(response.length > 0){
       setdata(response)
      }else{
@@ -37,27 +38,55 @@ useEffect(() => {
       setisloading(false)
     }
   }
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await GetTripDetails(); 
+    } catch (e) {
+      console.log(e);
+    }
+    setRefreshing(false);
+  };
+
   return (
    <RNContainer isLoading={isloading}>
     <RNHeader onLeftPress={() => navigation.navigate(NavRoutes.DRIVERPROFILE)} backarrowshow={true} title={'Order History'}/>
     <View style={{flex:1}}>
-      <FlatList contentContainerStyle={{rowGap:hp(2)}} bounces={false} data={data} 
+      <FlatList
+       refreshing={refreshing}           
+       onRefresh={onRefresh} 
+       refreshControl={
+       <RefreshControl
+         refreshing={refreshing}      
+         onRefresh={onRefresh}         
+         colors={[Colors.Orange]}           
+         tintColor={Colors.Orange}           
+       />}
+       contentContainerStyle={{rowGap:hp(2), flexGrow:1}} data={data} 
       renderItem={({item,index}) => (
-       <Pressable onPress={() => navigation.navigate(NavRoutes.DRIVERORDERDETAILS,{Data:item.TripDetails})} style={styles.crad}>
+       <Pressable onPress={() => navigation.navigate(NavRoutes.DRIVERORDERDETAILS,{Data:item.TripDetails,IsQrScan:item.IsQrScan})} style={styles.crad}>
         <View style={styles.detailswrapstyle}>
-             <RNText style={styles.labelstyle} children={'Trip Code :'}/>
+             {/* <RNText style={styles.labelstyle} children={'Trip Code :'}/> */}
              <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.TripCode}/>
+            {item.Delay && <View style={{ ...RNStyles.flexRow,columnGap:wp(2),}} >
+             <RNImage tintColor={item.Delay ? Colors.Red : Colors.Green}  style={styles.iconestyle} source={Images.dealy}/>
+             <RNText size={FontSize.font13} color={item.Delay ? Colors.Red : Colors.Green} children={item.Delay ? 'Delay Order' : 'Delivered On Time'}/>
+           </View>}
         </View>
-              <View style={styles.detailswrapstyle}>
+            <View style={styles.detailswrapstyle}>
              <RNImage tintColor={Colors.Orange}  style={styles.iconestyle} source={Images.date}/>
              <RNText  style={styles.valuetextstyle} children={item.CreatedDate}/>
            </View>
+           
        </Pressable>
       )}
-      ListEmptyComponent={() => (!isloading && 
-      <View style={{...RNStyles.flexCenter}}>
-        <RNText children={'No Data Found'}/>
-      </View>)}
+       ListEmptyComponent={() => ( !isloading && 
+        <View style={{...RNStyles.flexCenter}}>
+          <LottieView autoPlay loop  style={{height:wp(60),width:wp(60)}} source={require('../../assets/Lottie/NotFound.json')}/>
+          <RNText color={Colors.Orange} family={FontFamily.Medium} children={'No orders found'}/>
+        </View> 
+      )}
       />
     </View>
    </RNContainer>
