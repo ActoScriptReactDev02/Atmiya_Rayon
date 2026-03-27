@@ -15,12 +15,11 @@ const [isloading,setisloading] = useState(false);
             EndPoint:`Order/UpdateOrderStatus`,
             Params:{
               "OrderUniqueId": OrderUniqueId,
-             "UploadInvoice":''
             }
         })
     
         if(response.ResponseCode == 0){
-           toastdata({
+    toastdata({
       message:response.ResponseMessage,
         Sucess:true,
          Title:'Success'
@@ -41,7 +40,7 @@ const [isloading,setisloading] = useState(false);
     }
 }
   return (
-   <Modal transparent visible={visible} onRequestClose={onRequestClose}>
+   <Modal statusBarTranslucent={true} transparent visible={visible} onRequestClose={onRequestClose}>
    <View style={styles.modalcontiner}>
       <View style={styles.modalwrapstyle}>
           <RNImage tintColor={Colors.Orange} source={Images.warning} style={styles.iconestyle}/>

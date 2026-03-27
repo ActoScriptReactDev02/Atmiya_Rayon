@@ -9,6 +9,7 @@ import { Images } from '../../constants'
 import { useNavigation } from '@react-navigation/native'
 import Geolocation from 'react-native-geolocation-service'
 import { NavRoutes } from '../../navigation'
+import LottieView from 'lottie-react-native'
 
 
 const TripDetails = ({route}) => {
@@ -19,7 +20,6 @@ const TripDetails = ({route}) => {
  const navigation = useNavigation();
   const watchId = useRef(null);
   const hasNavigated = useRef(false);
-  console.log('route.params',route.params.IsQrScan);
   
 
   useEffect(() => {
@@ -114,7 +114,7 @@ const TripDetails = ({route}) => {
 
         if (distance < 50 && !hasNavigated.current) {
           hasNavigated.current = true;
-          console.log('Reached destination ✅');
+         // console.log('Reached destination ✅');
 
           // stop tracking
           if (watchId.current !== null) {
@@ -162,7 +162,6 @@ const TripDetails = ({route}) => {
       const response = await FetchMethod.GET({
         EndPoint: `TripMaster/GetCustomerOrderDetails?CustomerId=${CustomerId}`
       });
-console.log('response',response);
 
       if (response.length > 0) {
         setdata(response);
@@ -235,7 +234,6 @@ console.log('response',response);
     );
   })}
 </MapView>
-      
       </View>
       <FlatList contentContainerStyle={styles.contentcontainersyle} data={data} renderItem={({item,index}) => (
         <View style={[styles.mainwrapstyle,{opacity: item.IsDelivered ? 0.6 :1,borderColor: item.IsDelivered ? Colors.Green : Colors.Orange}]}>
@@ -263,11 +261,12 @@ console.log('response',response);
           </View>
         </View>
       )}
-      ListEmptyComponent={() =>(
-        <View style={{...RNStyles.flexCenter, paddingTop:hp(10)}}>
-          <RNText children={'No Data Found'} family={FontFamily.SemiBold} size={FontSize.font15}/>
-        </View>
-      )}
+      ListEmptyComponent={() => (!isloding && 
+              <View style={{...RNStyles.flexCenter}}>
+                <LottieView autoPlay loop  style={{height:wp(60),width:wp(60)}} source={require('../../assets/Lottie/NotFound.json')}/>
+                <RNText color={Colors.Orange} family={FontFamily.Medium} children={'No orders found'}/>
+              </View> 
+       )}
       />
      {selectTrip != null &&  <RNButton onPress={() => openMap()} btnstyles={{marginTop:hp(1), alignSelf:'center'}} title={'Start trip'}/>}
     </RNContainer>

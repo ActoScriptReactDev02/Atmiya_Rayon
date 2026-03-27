@@ -11,7 +11,7 @@ const RNHeader = ({title, backarrowshow,onLeftPress,onRightPress,righticonesourc
   const navigation = useNavigation()
   return (
     <View style={styles.continetstyle}>
-       { backarrowshow ? <TouchableOpacity onPress={onLeftPress}>
+       { backarrowshow ? <TouchableOpacity hitSlop={15} onPress={onLeftPress}>
          <RNImage tintColor={Colors.Orange} source={Images.Profile} style={{ height:wp(7),width:wp(7)}}/>
        </TouchableOpacity> : <TouchableOpacity onPress={() => (onLeftPress ? onLeftPress?.() : navigation.goBack())} style={[styles.imagerapstyle,{backgroundColor:Colors.Grey + '20'}]}>
          <RNImage source={Images.backarrow} style={styles.iconestyle}/>

@@ -69,18 +69,19 @@ const saveBase64Image = async () => {
    <RNContainer>
     <RNHeader title={'Profile'} righticonesource={Images.scanner} onRightPress={() => setshowqrcode(true)}/>
     <ScrollView bounces={false}>
-     <View style={{paddingHorizontal:wp(2)}}>
+     <View style={{paddingHorizontal:wp(2), paddingTop:hp(1), paddingBottom:hp(3)}}>
         <View style={styles.profileimagewrapstyle}>
           <RNImage resizeMode={'cover'} ImageUri={AsyncValue.Image} style={styles.imagestyle}/>
-          <RNText style={styles.titlestyle} children={AsyncValue.FirstName + ' ' + AsyncValue.LastName}/>
+          <RNText style={styles.titlestyle} children={AsyncValue.LastName}/>
           <RNText pTop={hp(0.5)} children={AsyncValue.MobileNo}/>
         </View>
         <View style={{paddingTop:hp(2)}}>
              
          <RnLabelView label={'Code'} value={AsyncValue.CustomerCode}/>
+         <RnLabelView label={'Company Name'} value={AsyncValue.FirstName}/>
            <RnLabelView label={'Email Id'} value={AsyncValue.EmailId}/>
             <RnLabelView label={'Gender'} value={AsyncValue.Gender}/>
-            <RnLabelView label={'Birth Date'} value={moment(AsyncValue.BirthDate).format('LL')}/>
+            {/* <RnLabelView label={'Birth Date'} value={moment(AsyncValue.BirthDate).format('LL')}/> */}
              <RnLabelView label={'Anniversary Date'} value={moment(AsyncValue.AnniversaryDate).format('LL')}/>
               <RnLabelView label={'UserType'} value={AsyncValue.UserType}/>
              {/* <View style={{alignSelf:'center', paddingVertical:hp(2)}}>
@@ -138,7 +139,8 @@ const styles = StyleSheet.create({
     fontFamily:FontFamily.SemiBold,
     fontSize:FontSize.font17,
     paddingTop:hp(1),
-    textTransform:'capitalize'
+    textTransform:'capitalize',
+    textAlign:'center'
   },
   btntextstyle:{
     color:Colors.Red,

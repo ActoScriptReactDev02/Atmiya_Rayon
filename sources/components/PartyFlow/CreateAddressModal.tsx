@@ -4,7 +4,7 @@ import { RNButton, RNImage, RNInput, RnlabelInput, RNStyles, RNText, RnToast } f
 import RNHeader from '../../common/RNHeader'
 import { Colors, FontFamily, hp, normalize, wp } from '../../theme'
 import { Images } from '../../constants'
-import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardStickyView } from 'react-native-keyboard-controller'
+import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardGestureArea, KeyboardStickyView } from 'react-native-keyboard-controller'
 import FetchMethod from '../../api/FetchMethod'
 import { useSelector } from 'react-redux'
 
@@ -91,7 +91,6 @@ const AddUserAddress = async() => {
            }
         })
        // console.log('AddUserAddress response',response);
-        
         if(response?.success){
      handletoast({
       message:response.message,
@@ -162,15 +161,14 @@ const updateaddress = async() =>{
     <Modal visible={visible} onRequestClose={onRequestClose} statusBarTranslucent={true} style={{zIndex:999}}>
         <View style={styles.modalcontiner}>
             <RNHeader onLeftPress={onRequestClose} title={'Add New Address'}  />
-            <KeyboardAwareScrollView   
-            //style={{ flex: 1 }}
-            bounces={false}
-            contentContainerStyle={{ flexGrow: 1 }}
-            enableOnAndroid={true}
+            <KeyboardAwareScrollView 
+            style={{flex:1}}
+            // bounces={false}
+            // contentContainerStyle={{ flexGrow: 1 }}
+            // enableOnAndroid={true}
             >
-                <KeyboardAvoidingView>
+          <KeyboardAvoidingView>
             <View style={{ paddingTop:hp(1), flex:1}}>
-               
                 <RnlabelInput 
                 labeltitle={'Loaction (Google)'} 
                 placeholder={'Type to search Location...'}/>

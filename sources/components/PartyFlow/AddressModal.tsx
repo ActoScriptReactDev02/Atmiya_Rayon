@@ -1,4 +1,4 @@
-import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
 import { RNImage, RNStyles, RNText, RnToast } from '../../common'
@@ -6,6 +6,7 @@ import { Images } from '../../constants'
 import CreateAddressModal from './CreateAddressModal'
 import FetchMethod from '../../api/FetchMethod'
 import { DeleleModal } from '..'
+import LottieView from 'lottie-react-native'
 
 const AddressModal = ({visible, onRequestClose, selectaddress}) => {
     const [addmodal, setaddmodal] = useState(false);
@@ -13,6 +14,7 @@ const AddressModal = ({visible, onRequestClose, selectaddress}) => {
     const [editdata, seteditdata] = useState({});
     const [showdeletemodal, setshowdeletemodal] = useState(false);
     const [deletedata, setdeletedata] = useState({})
+    const [isloading, setisloading]= useState(false)
       const [showtoast,Setshowtoast] = useState({
       isShow:false,
       message:'',
@@ -26,17 +28,20 @@ const AddressModal = ({visible, onRequestClose, selectaddress}) => {
 
   const GetUserAddress = async () => {
     try{
+      setisloading(true)
       const response = await FetchMethod.GET({
         EndPoint:`UserMaster/GetUserAddress`
       })
-      console.log('response',response);
+      //console.log('response',response);
       if(response.ResponseCode == 0){
       setaddressdata(response.Data);
       }else{
         setaddressdata([])
       }
+      setisloading(false)
         oncolsehandle()
     }catch(error){
+      setisloading(false)
         oncolsehandle()
       console.log('GetUserAddress error -->', error);
       
@@ -117,7 +122,11 @@ const oncolsehandle = () => {
                  </Pressable>
                  </View>
                  <View style={[styles.modalspace,{paddingTop:hp(0),flex:1}]}>
-            <FlatList bounces={false} contentContainerStyle={{marginBottom:hp(2)}} data={addressdata} 
+                { isloading ? <View style={{...RNStyles.flexCenter}}>
+                    <ActivityIndicator size={'large'} color={Colors.Orange}/>
+                    <RNText color={Colors.Orange} family={FontFamily.Medium} children={'Loading...'} pTop={hp(1)}/>
+                  </View> :
+            <FlatList bounces={false} contentContainerStyle={{marginBottom:hp(2), flex: (!isloading &&addressdata.length ===0 ) ? 1 : 0}} data={addressdata} 
             renderItem={({item,index}) => (
             <Pressable onPress={() => selectaddress(item)} style={styles.addressbtnstyle}>
                   <RNImage tintColor={Colors.Orange} style={{height:wp(5), width:wp(5)}} source={Images.loaction}/>  
@@ -142,17 +151,14 @@ const oncolsehandle = () => {
                   </View>}
                </View>
            </Pressable>
-           
-           // <Pressable onPress={() => selectaddress(item)} style={styles.addressbtnstyle}>
-            //     <View style={styles.selectedAddressIcon}>
-            //     <RNImage tintColor={'#4CAF50'} style={{height:wp(6), width:wp(6)}} source={Images.loaction}/>
-            //     </View>
-            //    <View style={{flex:1}}>
-            //      <RNText family={FontFamily.SemiBold} numOfLines={2} children={item.City}/>
-            //       <RNText style={styles.addresstextstyle} numOfLines={2} children={item.Address}/>
-            //     </View>
-            // </Pressable>
-           )}/> 
+           )}
+            ListEmptyComponent={() => ( !isloading && 
+                   <View style={{...RNStyles.flexCenter}}>
+                     <LottieView autoPlay loop  style={{height:wp(60),width:wp(60)}} source={require('../../assets/Lottie/NotFound.json')}/>
+                     <RNText color={Colors.Orange} family={FontFamily.Medium} children={'No address found'}/>
+                   </View> 
+                 )}
+           /> }
           
         </View>
          <Pressable style={styles.btnstyle} onPress={() => setaddmodal(true)}>

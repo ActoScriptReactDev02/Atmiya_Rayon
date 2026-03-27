@@ -69,10 +69,10 @@ useEffect(() => {
         <View style={styles.detailswrapstyle}>
              {/* <RNText style={styles.labelstyle} children={'Trip Code :'}/> */}
              <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.TripCode}/>
-            {item.Delay && <View style={{ ...RNStyles.flexRow,columnGap:wp(2),}} >
+            {/* {item.Delay && <View style={{ ...RNStyles.flexRow,columnGap:wp(2),}} >
              <RNImage tintColor={item.Delay ? Colors.Red : Colors.Green}  style={styles.iconestyle} source={Images.dealy}/>
              <RNText size={FontSize.font13} color={item.Delay ? Colors.Red : Colors.Green} children={item.Delay ? 'Delay Order' : 'Delivered On Time'}/>
-           </View>}
+           </View>} */}
         </View>
             <View style={styles.detailswrapstyle}>
              <RNImage tintColor={Colors.Orange}  style={styles.iconestyle} source={Images.date}/>

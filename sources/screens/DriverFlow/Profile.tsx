@@ -41,7 +41,7 @@ const [logoutmodal,setlogoutmodal] =useState(false);
          <RnLabelView label={'UserType'} value={AsyncValue.UserType}/>
          <View>
             <RNText color={Colors.Grey} family={FontFamily.SemiBold} size={FontSize.font14} children={'License'}/>
-            <RNImage style={styles.docImagestyle} ImageUri={'https://cms-img.coverfox.com/driving-license-gujarat.jpg'|| AsyncValue.License}/>
+            <RNImage style={styles.docImagestyle} ImageUri={AsyncValue.License}/>
          </View>
               <Pressable onPress={() => setlogoutmodal(true)} style={styles.btnstyle}>
                 <RNText style={styles.btntextstyle} children={'log out'}/>

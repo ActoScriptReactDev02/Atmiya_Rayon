@@ -86,7 +86,7 @@ const isvalid = isnavigate && state.password.length >4 && state.username.length 
   
   return (
    <RNContainer isLoading={isLoading}>
-    <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+    <KeyboardAwareScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
    <View style={styles.continer}>
     <View style={{...RNStyles.center}}>
     <RnImagesCard source={Images.Logo}/>

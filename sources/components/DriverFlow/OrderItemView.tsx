@@ -14,7 +14,7 @@ const OrderItemView = ({item,onPress}) => {
               <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.OrderCode}/>
               {item.IsDelivery ?  <View style={[styles.detailswrapstyle,{alignItems:'center'}]}>
                <RNImage  style={styles.iconestyle} source={Images.doneicone}/>
-                <RNText  style={styles.valuetextstyle} children={'Order Delivered'} />  </View> :
+                <RNText  style={styles.valuetextstyle} children={'Order Delivered'} /> </View> :
                 <View style={{backgroundColor:Colors.Orange, paddingHorizontal:wp(2), borderRadius:normalize(8), paddingTop:hp(0.2), ...RNStyles.flexRow, columnGap:wp(2)}}>
                     <RNText size={FontSize.font13} color={Colors.White} children={'Start trip'}/>
                     <RNImage tintColor={Colors.White} style={{height:wp(6),width:wp(6)}} source={Images.rightback}/>

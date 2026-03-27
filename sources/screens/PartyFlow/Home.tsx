@@ -115,7 +115,8 @@ const Home =  () => {
       if(response.ResponseCode == 0){
         if(response.Data.length > 0)
         {
-           setaddressdata(response.Data[0])
+          const defultaddress = response.Data.find(p => p.IsDefault)
+           setaddressdata(defultaddress ? defultaddress :response.Data[0])
        }
       }else{
         setaddressdata([])

@@ -21,12 +21,10 @@ const OrderDetails = ({ route }) => {
   const data = route.params.Data
 
   return (
-
     <RNContainer>
       <RNHeader
         title={'Order Details'}
       />
-
       <FlatList
         data={data}
         contentContainerStyle={{rowGap:hp(2)}}
@@ -39,11 +37,8 @@ const OrderDetails = ({ route }) => {
 
         )}
       />
-
     </RNContainer>
-
   )
-
 }
 
 export default OrderDetails
