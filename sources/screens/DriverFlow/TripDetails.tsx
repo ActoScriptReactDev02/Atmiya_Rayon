@@ -1,6 +1,6 @@
 import { FlatList, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { RNButton, RNContainer, RNImage, RNStyles, RNText } from '../../common'
+import { RNButton, RNContainer, RNImage, RNStyles, RNText, RnToast } from '../../common'
 import RNHeader from '../../common/RNHeader'
 import FetchMethod from '../../api/FetchMethod'
 import MapView, { Marker, Polyline } from 'react-native-maps';
@@ -10,27 +10,35 @@ import { useNavigation } from '@react-navigation/native'
 import Geolocation from 'react-native-geolocation-service'
 import { NavRoutes } from '../../navigation'
 import LottieView from 'lottie-react-native'
+import { DeliveryOrderModal } from '../../components/DriverFlow'
 
 
 const TripDetails = ({route}) => {
- const CustomerId = route.params.CustomerId
+ const TripId = route.params.TripId
  const [data,setdata] = useState([])
  const [isloding, setisloding] = useState(false)
   const [selectTrip, setselectTrip] = useState(null);
  const navigation = useNavigation();
   const watchId = useRef(null);
   const hasNavigated = useRef(false);
+const [selctedata, setselctedata] = useState({});
+const [visible, setvisible] = useState(false);
+  const [showtoast,Setshowtoast] = useState({
+  isShow:false,
+  message:'',
+  Sucess:false,
+  Title:''
+})
   
 
   useEffect(() => {
-    GetCustomerOrderDetails();  
-
+    getTrippdetails();
     return () => {
       if (watchId.current !== null) {
         Geolocation.clearWatch(watchId.current);
       }
     };
-  }, []);
+  }, [TripId]);
 
   // start tracking when selectTrip changes
   useEffect(() => {
@@ -145,48 +153,72 @@ const TripDetails = ({route}) => {
     Linking.openURL(url);
   };
 
-  const handlenavigate = () =>{
+  const handlenavigate = (v) =>{
     if(route.params.IsQrScan){
-        navigation.navigate(NavRoutes.SCAN)} 
+        navigation.navigate(NavRoutes.SCAN,{TripId:TripId})} 
     else{
-        navigation.navigate(NavRoutes.SCANORDER,{Data:data, CustomerId:CustomerId})
+      setselctedata(v);
+      setvisible(true)
+        //navigation.navigate(NavRoutes.SCANORDER,{Data:data, CustomerId:v.CustomerId})
       }
   }
 
-  // API call
-  const GetCustomerOrderDetails = async () => {
-    
-    try {
+  const getTrippdetails = async () => {
+    try{
       setisloding(true);
-
       const response = await FetchMethod.GET({
-        EndPoint: `TripMaster/GetCustomerOrderDetails?CustomerId=${CustomerId}`
-      });
-
-      if (response.length > 0) {
-        setdata(response);
-        const firstPending = response.find(
-          item => item.IsDelivered === false
+        EndPoint:`TripMaster/GetTripSubDetails/${TripId}`
+      })
+     
+      if(response.ResponseCode == 0){
+        if(response.Data.length > 0){
+         setdata(response.Data)
+           const firstPending = response.Data.find(
+          item => item.IsDelivery === false
         );
-         
         if (firstPending) {
           setselectTrip(firstPending);
         }
-      } else {
-        setdata([]);
-      }
-
-      setisloding(false);
-    } catch (error) {
-      setisloding(false);
-      console.log('GetCustomerOrderDetails Error -->', error);
+        }else{
+          setdata([])
+      }}else{
+          setdata([])
+        }
+      setisloding(false)
+    }catch(error){
+       setisloding(false)
+         setdata([])
+      console.log('getTrippdetails error --->', error);
+      
     }
-  };
+  }
+  const handletoast = (v) => {
+   Setshowtoast({
+           isShow: true,
+           Sucess: v.isSucess,
+           Title: v.titles,
+           message: v.messages,
+         });
+         setTimeout(() => {
+           Setshowtoast({
+             isShow: false,
+             Sucess: '',
+             Title: '',
+             message: '',
+           });
+     }, 2000);
+  }
+
+  const handleonclose =() => {
+    getTrippdetails()
+    setselctedata({});
+    setvisible(false)
+  }
 
   return (
     <RNContainer isLoading={isloding} style={{paddingHorizontal:wp(0)}}>
       <View style={{paddingHorizontal:wp(4)}}>
-        <RNHeader title={'Order'}/>
+        <RNHeader onLeftPress={() => navigation.navigate(NavRoutes.DRIVERHOME)} title={'Order'}/>
         </View>
         <View style={{height:hp(40)}}>
      <MapView
@@ -236,17 +268,21 @@ const TripDetails = ({route}) => {
 </MapView>
       </View>
       <FlatList contentContainerStyle={styles.contentcontainersyle} data={data} renderItem={({item,index}) => (
-        <View style={[styles.mainwrapstyle,{opacity: item.IsDelivered ? 0.6 :1,borderColor: item.IsDelivered ? Colors.Green : Colors.Orange}]}>
+        <View style={[styles.mainwrapstyle,{opacity: item.IsDelivery ? 0.6 :1,borderColor: item.IsDelivery ? Colors.Green : Colors.Orange}]}>
             <View style={{paddingBottom:hp(1)}}>
               <RNText size={FontSize.font13} family={FontFamily.SemiBold}  children={item.OrderCode}/>
             <View style={{position:'absolute', right:wp(2)}}>
-             {item.IsDelivered ?  <RNText family={FontFamily.SemiBold} color={item.IsDelivered ? Colors.Green :Colors.Orange} 
-              children={item.IsDelivered ? 'Delivered' :'Pending⏳'}/> :
-              <Pressable hitSlop={20} onPress={() => handlenavigate()}>
+             {item.IsDelivery ?  <RNText family={FontFamily.SemiBold} color={item.IsDelivery ? Colors.Green :Colors.Orange} 
+              children={item.IsDelivery ? 'Delivered' :'Pending⏳'}/> :
+              <Pressable hitSlop={20} onPress={() => handlenavigate(item)}>
                 <RNImage tintColor={Colors.Orange} style={{height:wp(5.5), width:wp(5.5)}} source={Images.scanner}/>
               </Pressable>}
               </View>
             </View>
+             <View style={styles.detailswrapstyle}>
+              <RNImage tintColor={Colors.Orange}  style={styles.iconestyle} source={Images.company}/>
+              <RNText numOfLines={1} style={styles.subtitlestyle} children={item.FirstName + ' (' + item.CustomerCode + ')'}/>
+          </View>
          <View style={styles.detailswrapstyle}>
               <RNImage tintColor={Colors.Orange}  style={styles.iconestyle} source={Images.date}/>
               <RNText  style={styles.valuetextstyle} children={item.OrderDate}/>
@@ -269,6 +305,12 @@ const TripDetails = ({route}) => {
        )}
       />
      {selectTrip != null &&  <RNButton onPress={() => openMap()} btnstyles={{marginTop:hp(1), alignSelf:'center'}} title={'Start trip'}/>}
+       {visible && <DeliveryOrderModal tosdata={data => handletoast(data)} visible={visible} 
+                     OrderUniqueIds={selctedata.OrderUniqueId} 
+                     onRequestClose={() => {setvisible(false), setselctedata({})}}
+                     onclose={() => handleonclose()}
+    />}
+    {showtoast.isShow && <RnToast  Message={showtoast.message} isSuccess={showtoast.Sucess} Title={showtoast.Title}  />}
     </RNContainer>
   )
 }
@@ -312,4 +354,9 @@ const styles = StyleSheet.create({
       height:wp(4),
       width:wp(4),
     },
+    subtitlestyle:{
+      flex:1,
+      fontFamily:FontFamily.SemiBold,
+      fontSize:FontSize.font13
+    }
 })

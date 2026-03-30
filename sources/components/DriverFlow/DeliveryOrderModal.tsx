@@ -92,7 +92,7 @@ const UpdateOrderDeliveryStatus = async () =>{
         titles :'Order Success',
         messages: response.ResponseMessage
       })
-    // onclose()
+      onclose()
         //navigation.navigate(NavRoutes.TRIPDETAILS,{CustomerId:route.params.CustomerId})
     
     } else{

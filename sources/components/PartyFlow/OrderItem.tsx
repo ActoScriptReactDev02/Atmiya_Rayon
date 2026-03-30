@@ -14,8 +14,15 @@ const OrderItem = ({item,editPress,deletepress,orderimagepress}) => {
             <View style={{flex:1}}>
             <View style={styles.titlewrapview}>
              <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.OrderCode}/>
-          <View style={[styles.orderflagstyle,{ borderColor:item.IsOrderConfirm == 'Confirm' ?'rgb(52 168 84)' : Colors.Red ,backgroundColor:item.IsOrderConfirm == 'Confirm' ? 'rgba(52, 168, 85, 0.2)': Colors.Red + '20'}]}>
-               <RNText family={FontFamily.Medium} color={item.IsOrderConfirm == 'Confirm' ?'rgb(52 168 84)' : Colors.Red} size={FontSize.font11} pTop={hp(0.2)} numOfLines={1}  children={item.IsOrderConfirm}/>
+          <View style={[styles.orderflagstyle,{ 
+            borderColor:item.IsDelivered ? item.Delay ? Colors.Red : Colors.Green : item.IsOrderConfirm == 'Confirm' ? Colors.Green : Colors.Red ,
+            backgroundColor:(item.IsDelivered ? item.Delay ? Colors.Red : Colors.Green : item.IsOrderConfirm == 'Confirm' ? Colors.Green : Colors.Red )+ '20'
+            }]}>
+               <RNText family={FontFamily.Medium} 
+               color={item.IsDelivered ? item.Delay ? Colors.Red : Colors.Green : item.IsOrderConfirm == 'Confirm' ? Colors.Green : Colors.Red}
+                size={FontSize.font11} pTop={hp(0.2)} numOfLines={1}  
+                children={item.IsDelivered ? item.Delay ? 'Delay Order' : 'Delivered On Time' : item.IsOrderConfirm}
+                />
           </View>
            </View>
              <View style={styles.detailswrapstyle}>

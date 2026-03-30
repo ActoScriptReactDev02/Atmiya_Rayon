@@ -132,7 +132,7 @@ const oncolsehandle = () => {
                   <RNImage tintColor={Colors.Orange} style={{height:wp(5), width:wp(5)}} source={Images.loaction}/>  
                   <View style={{flex:1}}>
                 <View style={{...RNStyles.flexRow}}>
-                  <RNText style={{flex:1}} family={FontFamily.SemiBold} numOfLines={2} children={item.City}/>
+                  <RNText style={{flex:1}} family={FontFamily.SemiBold} numOfLines={2} children={item.AreaCodename}/>
                   <View style={styles.acttionbtnwrapstyle}>
                     <Pressable onPress={() => handleEditdata(item)} hitSlop={10}>
                         <RNImage source={Images.Edit} style={styles.actionbtniconestyle} tintColor={Colors.Blue}/>

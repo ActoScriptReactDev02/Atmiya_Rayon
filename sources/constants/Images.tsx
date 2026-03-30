@@ -35,7 +35,10 @@ const Images ={
     rightback:require(Iconepath + 'rightback' + png),
     search:require(Iconepath + 'search' + png),
     warning:require(Iconepath + 'warning' + png),
-    dealy:require(Iconepath + 'dealy' + png)
+    dealy:require(Iconepath + 'dealy' + png),
+    company: require(Iconepath + 'company' + png),
+    box: require(Iconepath + 'box' + png),
+    downArrow: require(Iconepath+ 'downArrow' + png)
 }
 
 export default Images

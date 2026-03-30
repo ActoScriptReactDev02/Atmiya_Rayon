@@ -1,10 +1,10 @@
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { RNContainer, RNImage, RNStyles, RNText } from '../../common'
 import RNHeader from '../../common/RNHeader'
 import FetchMethod from '../../api/FetchMethod'
 import { OrderItemView } from '../../components/DriverFlow'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { NavRoutes } from '../../navigation'
 import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../../theme'
 import { Images } from '../../constants'
@@ -14,8 +14,11 @@ const OrderHistory = () => {
   const [data, setdata] = useState([])
   const [isloading, setisloading] = useState(false)
   const navigation = useNavigation()
-     const [refreshing, setRefreshing] = useState(false);
-  
+  const [refreshing, setRefreshing] = useState(false);
+
+  // useFocusEffect(useCallback(() => {
+  //   GetTripDetails()
+  // },[]))
 
 useEffect(() => {
  GetTripDetails()
@@ -23,6 +26,8 @@ useEffect(() => {
 
   const GetTripDetails = async () => {
     try{
+      console.log('test');
+      
       setisloading(true)
      const response = await FetchMethod.GET({
       EndPoint:`TripMaster/GetTripDetails`
@@ -50,7 +55,7 @@ useEffect(() => {
   };
 
   return (
-   <RNContainer isLoading={isloading}>
+   <RNContainer >
     <RNHeader onLeftPress={() => navigation.navigate(NavRoutes.DRIVERPROFILE)} backarrowshow={true} title={'Order History'}/>
     <View style={{flex:1}}>
       <FlatList
@@ -65,14 +70,17 @@ useEffect(() => {
        />}
        contentContainerStyle={{rowGap:hp(2), flexGrow:1}} data={data} 
       renderItem={({item,index}) => (
-       <Pressable onPress={() => navigation.navigate(NavRoutes.DRIVERORDERDETAILS,{Data:item.TripDetails,IsQrScan:item.IsQrScan})} style={styles.crad}>
+       <Pressable 
+       onPress={() => navigation.navigate(NavRoutes.TRIPDETAILS,{TripId:item.TripId, IsQrScan:item.IsQrScan})}
+       //onPress={() => navigation.navigate(NavRoutes.DRIVERORDERDETAILS,{TripId:item.TripId,IsQrScan:item.IsQrScan})} 
+       style={styles.crad}>
         <View style={styles.detailswrapstyle}>
              {/* <RNText style={styles.labelstyle} children={'Trip Code :'}/> */}
              <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.TripCode}/>
-            {/* {item.Delay && <View style={{ ...RNStyles.flexRow,columnGap:wp(2),}} >
-             <RNImage tintColor={item.Delay ? Colors.Red : Colors.Green}  style={styles.iconestyle} source={Images.dealy}/>
-             <RNText size={FontSize.font13} color={item.Delay ? Colors.Red : Colors.Green} children={item.Delay ? 'Delay Order' : 'Delivered On Time'}/>
-           </View>} */}
+            <View style={{ ...RNStyles.flexRow,columnGap:wp(2),}} >
+             <RNImage   style={styles.iconestyle} source={Images.box}/>
+             <RNText size={FontSize.font13}  children={item.TotalOrders}/>
+           </View>
         </View>
             <View style={styles.detailswrapstyle}>
              <RNImage tintColor={Colors.Orange}  style={styles.iconestyle} source={Images.date}/>
@@ -103,9 +111,9 @@ const styles = StyleSheet.create({
    borderRadius:normalize(8),
   },
      detailswrapstyle:{
-        ...RNStyles.flexRow,
-        columnGap:wp(2),
-        paddingVertical:hp(0.4)
+      ...RNStyles.flexRow,
+      columnGap:wp(2),
+      paddingVertical:hp(0.4)
     },
     labelstyle:{
         color:Colors.Grey,

@@ -14,7 +14,7 @@ import FetchMethod from '../../api/FetchMethod';
 import { useNavigation } from '@react-navigation/native';
 import { NavRoutes } from '../../navigation';
 
-const Scan = () => {
+const Scan = ({route}) => {
     const device = useCameraDevice("back");
     const { hasPermission, requestPermission } = useCameraPermission();
     const [isScanning, setIsScanning] = useState(false);
@@ -47,7 +47,7 @@ const scandata = async (value) => {
     
     if(response.length >0){
       setIsActive(false)
-       navigtion.navigate(NavRoutes.SCANORDER,{Data:response, CustomerId:value})
+       navigtion.navigate(NavRoutes.SCANORDER,{Data:response, CustomerId:value,TripId:route.params.TripId})
     }
   }catch(error){
     navigtion.goBack()

@@ -5,6 +5,8 @@ import RNHeader from '../../common/RNHeader'
 import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
 import { Images } from '../../constants'
 import { DeliveryOrderModal } from '../../components/DriverFlow'
+import { useNavigation } from '@react-navigation/native'
+import { NavRoutes } from '../../navigation'
 
 const ScanOrder = ({route}) => {
   const [data,setdata] = useState(route.params.Data);
@@ -16,6 +18,7 @@ const ScanOrder = ({route}) => {
     Sucess:false,
     Title:''
   })
+  const navigation = useNavigation()
 
   const handletoast = (v) => {
    Setshowtoast({
@@ -32,6 +35,12 @@ const ScanOrder = ({route}) => {
              message: '',
            });
      }, 2000);
+  }
+
+  const handleonclose= () => {
+    setvisible(false);
+    setselctedata({});
+    navigation.replace(NavRoutes.TRIPDETAILS,{TripId:route.params.TripId, IsQrScan:true})
   }
     
   return (
@@ -59,7 +68,11 @@ const ScanOrder = ({route}) => {
            </View>
     </Pressable>
    )}/>
-   {visible && <DeliveryOrderModal tosdata={data => handletoast(data)} visible={visible} OrderUniqueIds={selctedata.OrderUniqueId} onRequestClose={() => {setvisible(false), setselctedata({})}} />}
+   {visible && <DeliveryOrderModal tosdata={data => handletoast(data)} visible={visible} 
+                     OrderUniqueIds={selctedata.OrderUniqueId} 
+                     onRequestClose={() => {setvisible(false), setselctedata({})}}
+                     onclose={() => handleonclose()}
+    />}
     {showtoast.isShow && <RnToast  Message={showtoast.message} isSuccess={showtoast.Sucess} Title={showtoast.Title}  />}
  </RNContainer>
   )
