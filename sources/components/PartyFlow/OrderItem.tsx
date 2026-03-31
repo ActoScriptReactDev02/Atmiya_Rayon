@@ -3,10 +3,13 @@ import React from 'react'
 import { Colors, FontSize, hp, wp, normalize, height, width, FontFamily, isIOS } from '../../theme'
 import { RNImage, RNStyles, RNText } from '../../common'
 import { Images } from '../../constants'
+import { useNavigation } from '@react-navigation/native'
+import { NavRoutes } from '../../navigation'
 
 const OrderItem = ({item,editPress,deletepress,orderimagepress}) => {
+  const navigation = useNavigation()
   return (
-    <View style={styles.continer}>
+    <Pressable disabled={!item.IsDelivered} onPress={() => navigation.navigate(NavRoutes.DELIVERYSTATUS,{OrderUniqueId:item.OrderUniqueId})}  style={styles.continer}>
         <View style={{flex: 1, flexDirection:'row', columnGap:wp(2)}}>
           <TouchableOpacity  onPress={orderimagepress} style={styles.imagewrapstyle}>
             <RNImage resizeMode={'cover'} ImageUri={item.OrderPhoto} style={{...RNStyles.image100,borderRadius:normalize(5)}}/>
@@ -53,7 +56,7 @@ const OrderItem = ({item,editPress,deletepress,orderimagepress}) => {
             </View>}
             </View>
            </View>
-    </View>
+    </Pressable>
   )
 }
 

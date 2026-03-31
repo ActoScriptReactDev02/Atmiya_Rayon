@@ -6,7 +6,7 @@ import FetchMethod from '../../api/FetchMethod'
 import { OrderItemView } from '../../components/DriverFlow'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { NavRoutes } from '../../navigation'
-import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../../theme'
+import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
 import { Images } from '../../constants'
 import LottieView from 'lottie-react-native'
 
@@ -26,12 +26,12 @@ useEffect(() => {
 
   const GetTripDetails = async () => {
     try{
-      console.log('test');
       
       setisloading(true)
      const response = await FetchMethod.GET({
       EndPoint:`TripMaster/GetTripDetails`
      })
+     
      if(response.length > 0){
       setdata(response)
      }else{
@@ -49,7 +49,7 @@ useEffect(() => {
     try {
       await GetTripDetails(); 
     } catch (e) {
-      console.log(e);
+      //console.log(e);
     }
     setRefreshing(false);
   };
@@ -86,7 +86,15 @@ useEffect(() => {
              <RNImage tintColor={Colors.Orange}  style={styles.iconestyle} source={Images.date}/>
              <RNText  style={styles.valuetextstyle} children={item.CreatedDate}/>
            </View>
-           
+
+            {item.EndedTrip &&
+            <View style={{flexDirection:'row', alignItems:'flex-start'}}>
+            <View style={[styles.detailswrapstyle,{flex:1}]}>
+             <RNImage tintColor={Colors.Green}  style={styles.iconestyle} source={Images.successicone}/>
+             <RNText size={FontSize.font12} color={Colors.Green} family={FontFamily.SemiBold} style={styles.valuetextstyle} children={'Trip completed'}/>
+           </View> 
+            <RNImage  tintColor={Colors.Green}  style={{height:wp(7),width:wp(7)}} source={Images.DeliveryDone}/>
+           </View>}
        </Pressable>
       )}
        ListEmptyComponent={() => ( !isloading && 

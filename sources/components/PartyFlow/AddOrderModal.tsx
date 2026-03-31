@@ -46,10 +46,9 @@ const handlegellary = () => {
     setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
   })
   .catch((error) => {
-    console.log('handlegellary error -->', error);
-
+    //console.log('handlegellary error -->', error);
     if (error.code === 'E_PICKER_CANCELLED') {
-       setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+       setstate(p => ({...p, imagedata:{uri:'', base64:''}}))
     }
   });
 };
@@ -66,9 +65,9 @@ const handlecamara = () => {
   })
   .catch((error) => {
     if (error.code === 'E_PICKER_CANCELLED') {
-     setstate(p => ({...p, imagedata:{uri:image.path, base64:image.data}}))
+     setstate(p => ({...p, imagedata:{uri:'', base64:''}}))
     } else {
-      console.log('Camera error:', error);
+      //console.log('Camera error:', error);
     }
   });
 };
@@ -82,12 +81,13 @@ const handleorderadd = async () => {
     const response = await FetchMethod.POST({
       EndPoint:`Order`,
       Params:{
-              "OrderDate": state.date,
+              "OrderDate": moment(state.date).format(),
               "OrderPhoto": state.imagedata.base64,
               "OrderDeliveryAddressId": selectAddress.Id,
               "Remark": state.remark
               }
     })
+    
     if(response.ResponseCode == 0){
      toastdata({
       message:response.ResponseMessage,
@@ -98,7 +98,7 @@ const handleorderadd = async () => {
     }
     setisLoading(false)
   }catch(error){
-    console.log('Order add api error -->', error);
+   // console.log('Order add api error -->', error);
     onRequestClose();
     setisLoading(false);
      toastdata({
@@ -117,7 +117,7 @@ const handleupdate = async () => {
     const response = await FetchMethod.PUT({
       EndPoint:`Order/UpdateOrder/${editData.OrderUniqueId}`,
       Params:{
-  "OrderDate": state.date.toISOString(),
+  "OrderDate": moment(state.date).format(),
   "OrderPhoto": state.imagedata.base64 || '',
   "OrderDeliveryAddressId": selectAddress.Id,
   "Remark": state.remark
@@ -235,7 +235,7 @@ const handleupdate = async () => {
                        <View style={{...RNStyles.flexRow, flex:1, columnGap:wp(1)}}>
                         <View style={{flex:1}}>
                              <RNText family={FontFamily.SemiBold} children={selectAddress?.City}/>
-                           <RNText numOfLines={2} style={styles.addresstext} children={selectAddress?.Address}/>
+                           <RNText numOfLines={2} style={styles.addresstext} children={selectAddress?.Address + ' ,'+ selectAddress?.Location}/>
                         </View>
                          <RNImage tintColor={Colors.Grey} style={{height:wp(4), width:wp(4),transform: [
                           {

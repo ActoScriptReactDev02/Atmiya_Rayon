@@ -65,13 +65,13 @@ const DeliveryOrderModal = ({visible,onRequestClose,OrderUniqueIds,tosdata, oncl
     }));
       //setvisible(false)
     } else {
-      console.log('Camera error:', error);
+      //console.log('Camera error:', error);
     }
   });
 };
 
 const UpdateOrderDeliveryStatus = async () =>{
-  setisnavigate(true)
+  setisnavigate(true);
   if(isvalid){
   try{
     setisloading(true)
@@ -94,7 +94,6 @@ const UpdateOrderDeliveryStatus = async () =>{
       })
       onclose()
         //navigation.navigate(NavRoutes.TRIPDETAILS,{CustomerId:route.params.CustomerId})
-    
     } else{
       tosdata({
         isSucess:false,
@@ -105,7 +104,7 @@ const UpdateOrderDeliveryStatus = async () =>{
     setisloading(false)
   }catch(error){
     setisloading(false);
-    console.log('UpdateOrderDeliveryStatus error -->', error);
+    //console.log('UpdateOrderDeliveryStatus error -->', error);
     if(error.responseMSG){
     tosdata({
         isSucess:false,

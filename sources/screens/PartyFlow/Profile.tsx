@@ -35,7 +35,6 @@ const saveBase64Image = async () => {
 
     qrRef.current.toDataURL(async (base64Data) => {
 
-      console.log("base64Data:", base64Data);
 
       const path =
         ReactNativeBlobUtil.fs.dirs.CacheDir + "/qr_image.png";
@@ -50,15 +49,12 @@ const saveBase64Image = async () => {
       // save to gallery
       const saved = await CameraRoll.save(path, { type: "photo" });
 
-      console.log("Saved:", saved);
-
       Alert.alert("QR saved to gallery");
 
     });
 
   } catch (error) {
-
-    console.log("Save Error:", error);
+   // console.log("Save Error:", error);
 
   }
 

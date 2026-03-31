@@ -26,7 +26,7 @@ const handlegellary = () => {
     }));
   })
   .catch((error) => {
-    console.log('handlegellary error -->', error);
+    //console.log('handlegellary error -->', error);
 
     if (error.code === 'E_PICKER_CANCELLED') {
       setstate(p => ({
@@ -61,7 +61,7 @@ const handlecamara = () => {
         base64: ''
       }));
     } else {
-      console.log('Camera error:', error);
+     // console.log('Camera error:', error);
     }
   });
 };
@@ -87,7 +87,7 @@ const updateinvoice = async () => {
             setisloading(false);
         }
     }catch(error){
-        console.log('updateinvoice error -->',error);
+       //console.log('updateinvoice error -->',error);
         setisloading(false);
          toastdata({
       message:error?.responseMSG.Message,

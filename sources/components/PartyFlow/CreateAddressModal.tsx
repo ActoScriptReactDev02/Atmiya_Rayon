@@ -122,7 +122,6 @@ const AddUserAddress = async() => {
              "AreaCodeId":state.area.areaCodeId
            }
         })
-        console.log('AddUserAddress response',response);
         if(response?.success){
      handletoast({
       message:response.message,
@@ -140,7 +139,7 @@ const AddUserAddress = async() => {
         setisLoading(false)
     }catch(error){
         setisLoading(false)
-        console.log('AddUserAddress error --->', error);
+        //console.log('AddUserAddress error --->', error);
         
     }}
 }
@@ -161,11 +160,12 @@ const updateaddress = async() =>{
               "Landmark": state.landmark,
               "Pincode": state.pincode,
               "Location": state.loactionData.description,
-              "Latitude": state.loactionData.lat,
-              "Longitude": state.loactionData.lng,
+              "Latitude": state.loactionData.lat.toString(),
+              "Longitude": state.loactionData.lng.toString(),
               "AreaCodeId":state.area.areaCodeId
       }
         })
+        console.log('AddUpdateAddress response',response);
         if(response?.success){
      handletoast({
       message:response.message,
@@ -173,7 +173,7 @@ const updateaddress = async() =>{
          Title:'Success'
      })
      onclose()
-        }else{
+    }else{
     handletoast({
       message:response.message,
         Sucess:false,
@@ -183,7 +183,7 @@ const updateaddress = async() =>{
         setisLoading(false)
       }catch(error){
          setisLoading(false)
-        console.log('updateaddress error -->', error);
+        //console.log('updateaddress error -->', error);
         
       }
     }
@@ -211,7 +211,7 @@ const GetAreaCodeApi = async () => {
   }catch(error){
      setareaCodeData([])
      setarealoading(false)
-    console.log('GetAreaCode api error --->', error);
+    //console.log('GetAreaCode api error --->', error);
     
   }
 }
@@ -221,37 +221,27 @@ const GetAreaCodeApi = async () => {
     <Modal visible={visible} onRequestClose={onRequestClose} statusBarTranslucent={true} style={{zIndex:999}}>
         <View style={styles.modalcontiner}>
             <RNHeader onLeftPress={onRequestClose} title={'Add New Address'}  />
-            <KeyboardAwareScrollView 
-            style={{flex:1}}
-            // bounces={false}
-            // contentContainerStyle={{ flexGrow: 1 }}
-            // enableOnAndroid={true}
-            >
-          <KeyboardAvoidingView>
-            <View style={{ paddingTop:hp(1), flex:1}}>
-              <View style={{marginBottom:hp(1.5)}}>
+            <View style={{marginBottom:hp(1.5), paddingTop:hp(1)}}>
               <View style={styles.labelwrapstyle}>
                 <RNText style={styles.labelstyle} children={'Loaction (Google)'}/>
                  <RNText color={Colors.Red} children={'*'}/>
               </View>
+              
               <GooglePlacesAutocomplete
+              debounce={200}
+              enablePoweredByContainer={false}
+                
               keyboardShouldPersistTaps="handled"
               fetchDetails={true}
                   styles={{
                           container: {
                             marginBottom: hp(1),
                             flex: 0,
-                            zIndex: 9999,
+                             zIndex: 9999, 
                           },
-                          textInput: {
-                            ...styles.googletextinput, 
-                          },
-                          listView: {
-                            ...styles.googlelistview,   
-                          },
-                          poweredContainer: {
-                            display: 'none',
-                          },
+                          textInput: {...styles.googletextinput,},
+                          listView: { ...styles.googlelistview, },
+                          poweredContainer: { display: 'none', },
                         }}
                 keepResultsAfterBlur={false}
                 textInputProps={{
@@ -259,8 +249,9 @@ const GetAreaCodeApi = async () => {
                    value: state.loactionData.description,
                   onChangeText: (text) => setstate(p => ({...p, loactionData:{description:text}})),
                  }}
-                     placeholder='Type to search Location...'
+                    placeholder='Type to search Location...'
                     onPress={(data, details = null) => {
+                      // console.log('CLICK WORKING');
                       //  const selectedLocation = {
                       //     address: data.description,
                       //     lat: details?.geometry?.location?.lat,
@@ -281,7 +272,15 @@ const GetAreaCodeApi = async () => {
                      }}
                    />
                  {loactionerror &&  <RNText size={FontSize.font9} color={Colors.Red} children={'Please enter a valid loaction'}/>}
-                  </View>
+              </View>
+            <KeyboardAwareScrollView 
+             keyboardShouldPersistTaps="handled"   
+            nestedScrollEnabled={true} 
+            style={{flex:1}}
+            >
+          <KeyboardAvoidingView>
+            <View style={{  flex:1}}>
+              
                 <RnlabelInput 
                 labeltitle={'Address'} 
                 placeholder={'Enter Address'}
@@ -445,7 +444,7 @@ const styles = StyleSheet.create({
       borderRadius: normalize(5),
       borderWidth: normalize(1),
       borderColor: Colors.BorderColor,
-      elevation: 3, // Android shadow
+      elevation: 10, // Android shadow
       shadowColor: '#000', // iOS shadow
       shadowOpacity: 0.1,
       shadowRadius: 5,

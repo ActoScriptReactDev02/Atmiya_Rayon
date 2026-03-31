@@ -94,7 +94,7 @@ const requestLocationPermission = async () => {
     );
 
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("Location permission granted");
+     // console.log("Location permission granted");
     } else {
       console.log("Location permission denied");
     }

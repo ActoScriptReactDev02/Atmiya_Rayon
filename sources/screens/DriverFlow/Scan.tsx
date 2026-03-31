@@ -1,4 +1,4 @@
-import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Alert, Animated, Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { RNButton, RNContainer, RNImage, RNStyles, RNText } from '../../common'
 import RNHeader from '../../common/RNHeader'
@@ -21,9 +21,31 @@ const Scan = ({route}) => {
     const navigtion = useNavigation();
     const [isActive, setIsActive] = useState(true);
 
-  useEffect(() => {
-    if (!hasPermission) requestPermission();
-  }, [hasPermission]);
+useEffect(() => {
+  checkPermission();
+}, []);
+
+const checkPermission = async () => {
+  const result = await requestPermission();
+
+  if (result) {
+    setIsActive(true);
+  } else {
+    setIsActive(false);
+       await requestPermission();
+    Alert.alert(
+      "Camera Permission Required",
+      "Please enable camera permission from settings",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Open Settings",
+          onPress: () => Linking.openSettings(),
+        },
+      ]
+    );
+  }
+};
   
 const codeScanner = useCodeScanner({
   codeTypes: ['qr', 'ean-13'],
@@ -51,7 +73,7 @@ const scandata = async (value) => {
     }
   }catch(error){
     navigtion.goBack()
-    console.log('Scan data api error -->', error);
+    ///console.log('Scan data api error -->', error);
     
   }
 }
@@ -59,12 +81,13 @@ const scandata = async (value) => {
   return (
 
    <View style={{ flex: 1 }}>
-      <Camera
+     {isActive && <Camera
+        key={device.id}
         style={StyleSheet.absoluteFill}
         device={device}
         isActive={isActive}
         codeScanner={codeScanner}
-      />
+      />}
         <View style={styles.header}>
            <Pressable onPress={() => navigtion.goBack()}>
             <RNImage tintColor={'#fff'} source={Images.backarrow} style={{height:wp(6), width:wp(6)}}/>

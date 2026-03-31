@@ -43,7 +43,7 @@ const AddressModal = ({visible, onRequestClose, selectaddress}) => {
     }catch(error){
       setisloading(false)
         oncolsehandle()
-      console.log('GetUserAddress error -->', error);
+      //console.log('GetUserAddress error -->', error);
       
     }
   }
@@ -96,7 +96,7 @@ const deleteapi = async () => {
     }
   }catch(error){
     oncolsehandle()
-    console.log('deleteapi error --->', error);
+    //console.log('deleteapi error --->', error);
     
   }
 }
@@ -168,7 +168,7 @@ const oncolsehandle = () => {
     </View>
      {showtoast.isShow && <RnToast toastcontinerstyle={{ top:hp(4)}}  Message={showtoast.message} isSuccess={showtoast.Sucess} Title={showtoast.Title}  />}
      {showdeletemodal && <DeleleModal onPress={() => deleteapi()} visible={showdeletemodal} title={'Delete Address'} subcontent={'Are you sure you want to remove this address from the list?'}  onRequestClose={() => {setshowdeletemodal(false),setdeletedata({})}}/> }
-    {addmodal && <CreateAddressModal Editdata={editdata} onclose={() => { GetUserAddress()}} visible={addmodal} onRequestClose={() => {setaddmodal(false),seteditdata({});}}/>}
+    {addmodal && <CreateAddressModal Editdata={editdata} onclose={() =>  GetUserAddress()} visible={addmodal} onRequestClose={() => {setaddmodal(false),seteditdata({});}}/>}
    </Modal>
   )
 }   

@@ -102,7 +102,7 @@ const Home =  () => {
     }catch(error){
       SetisLoading(false);
       setorderData([]);
-      console.log('getorderdata api error ===>', error);
+     // console.log('getorderdata api error ===>', error);
     }
   }
 
@@ -122,7 +122,7 @@ const Home =  () => {
         setaddressdata([])
       }
     }catch(error){
-      console.log('GetUserAddress error -->', error);
+      //console.log('GetUserAddress error -->', error);
       
     }
   }

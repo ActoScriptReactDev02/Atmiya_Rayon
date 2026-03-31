@@ -48,7 +48,7 @@ const OrderDetails = ({ route }) => {
     }catch(error){
        setloading(false)
          setdata([])
-      console.log('getTrippdetails error --->', error);
+      //console.log('getTrippdetails error --->', error);
       
     }
   }

@@ -12,7 +12,8 @@
     SCAN:'Scanner',
     SCANORDER:'Scan Order Details',
     TRIP:'Start Trip',
-    TRIPDETAILS:'Trip Details'
+    TRIPDETAILS:'Trip Details',
+    DELIVERYSTATUS:'Delivery Status'
  }
 
  export default NavRoutes

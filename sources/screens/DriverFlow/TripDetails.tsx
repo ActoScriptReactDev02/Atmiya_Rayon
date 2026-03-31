@@ -1,4 +1,4 @@
-import { FlatList, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, FlatList, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { RNButton, RNContainer, RNImage, RNStyles, RNText, RnToast } from '../../common'
 import RNHeader from '../../common/RNHeader'
@@ -47,24 +47,47 @@ const [visible, setvisible] = useState(false);
     }
   }, [selectTrip]);
 
-   const requestLocationPermission = async () => {
-  
-      if (Platform.OS === "android") {
-  
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-            title: "Location Permission",
-            message: "App needs location access",
-            buttonPositive: "OK",
-          }
-        )
-  
-        return granted === PermissionsAndroid.RESULTS.GRANTED
-      }
-  
-      return true
+  const requestLocationPermission = async () => {
+  if (Platform.OS === "android") {
+
+    const alreadyGranted = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    );
+
+    if (alreadyGranted) {
+      return true;
     }
+
+    const result = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: "Location Permission",
+        message: "App needs location access",
+        buttonPositive: "OK",
+      }
+    );
+
+    if (result === PermissionsAndroid.RESULTS.GRANTED) {
+      return true;
+    }
+
+    if (result === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      // 🚨 BLOCKED CASE
+      Alert.alert(
+        "Permission Blocked",
+        "Enable location permission from settings",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Open Settings", onPress: () => Linking.openSettings() }
+        ]
+      );
+    }
+
+    return false;
+  }
+
+  return true;
+};
 
   // distance formula
   const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
@@ -100,7 +123,7 @@ const [visible, setvisible] = useState(false);
   const startTracking = async () => {
      const granted = await requestLocationPermission()
       if (!granted) {
-        console.log("Permission denied");
+       // console.log("Permission denied");
     return;
   }
     hasNavigated.current = false;
@@ -144,13 +167,11 @@ const [visible, setvisible] = useState(false);
   // open Google Map navigation
   const openMap = () => {
     const destination = getCurrentDestination();
-    console.log('destination',destination);
+    //console.log('destination',destination);
     if (!destination) return;
 
     const url = `https://www.google.com/maps/dir/?api=1&destination=${destination.latitude},${destination.longitude}&travelmode=driving`;
-     console.log('url',url);
-
-    Linking.openURL(url);
+     Linking.openURL(url);
   };
 
   const handlenavigate = (v) =>{
@@ -188,7 +209,7 @@ const [visible, setvisible] = useState(false);
     }catch(error){
        setisloding(false)
          setdata([])
-      console.log('getTrippdetails error --->', error);
+      //console.log('getTrippdetails error --->', error);
       
     }
   }
@@ -329,7 +350,7 @@ const styles = StyleSheet.create({
   contentcontainersyle :{
     paddingTop:hp(2), 
     paddingHorizontal:wp(2), 
-    rowGap:hp(1.8)
+    rowGap:hp(1.8),
   },
   mainwrapstyle:{
     backgroundColor:Colors.White,

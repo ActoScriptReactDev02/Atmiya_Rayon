@@ -70,7 +70,7 @@ const [confirmModal, setconfirmModal] = useState(false);
   try {
     await getorderapi(); 
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   }
   setRefreshing(false);
 };
