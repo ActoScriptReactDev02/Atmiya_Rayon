@@ -40,7 +40,7 @@ const ScanOrder = ({route}) => {
   const handleonclose= () => {
     setvisible(false);
     setselctedata({});
-    navigation.replace(NavRoutes.TRIPDETAILS,{TripId:route.params.TripId, IsQrScan:true})
+    navigation.replace(NavRoutes.TRIPDETAILS,{TripId:route.params.TripId, IsQrScan:true,EndedTrip:false, TripStart:true})
   }
     
   return (

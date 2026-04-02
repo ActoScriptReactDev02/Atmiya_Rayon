@@ -24,7 +24,7 @@ const OrderItem = ({item,editPress,deletepress,orderimagepress}) => {
                <RNText family={FontFamily.Medium} 
                color={item.IsDelivered ? item.Delay ? Colors.Red : Colors.Green : item.IsOrderConfirm == 'Confirm' ? Colors.Green : Colors.Red}
                 size={FontSize.font11} pTop={hp(0.2)} numOfLines={1}  
-                children={item.IsDelivered ? item.Delay ? 'Delay Order' : 'Delivered On Time' : item.IsOrderConfirm}
+                children={item.IsDelivered ? item.Delay ? 'Delay Order' : 'Delivered' : item.IsOrderConfirm}
                 />
           </View>
            </View>

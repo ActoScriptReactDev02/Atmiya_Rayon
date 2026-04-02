@@ -9,6 +9,7 @@ import { NavRoutes } from '../../navigation'
 import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
 import { Images } from '../../constants'
 import LottieView from 'lottie-react-native'
+import moment from 'moment'
 
 const OrderHistory = () => {
   const [data, setdata] = useState([])
@@ -59,6 +60,11 @@ useEffect(() => {
     <RNHeader onLeftPress={() => navigation.navigate(NavRoutes.DRIVERPROFILE)} backarrowshow={true} title={'Order History'}/>
     <View style={{flex:1}}>
       <FlatList
+       keyExtractor={(item, index) => index.toString()}
+        initialNumToRender={10}       // first load only 5 items
+       maxToRenderPerBatch={10}      // render batch size
+         windowSize={5}               // control buffer
+         removeClippedSubviews={true}
        refreshing={refreshing}           
        onRefresh={onRefresh} 
        refreshControl={
@@ -69,17 +75,18 @@ useEffect(() => {
          tintColor={Colors.Orange}           
        />}
        contentContainerStyle={{rowGap:hp(2), flexGrow:1}} data={data} 
-      renderItem={({item,index}) => (
+      renderItem={({item,index}) => {
+           const barWidth = Math.floor(Math.random() * (80 - 20 + 1)) + 20;
+        return (
        <Pressable 
-       onPress={() => navigation.navigate(NavRoutes.TRIPDETAILS,{TripId:item.TripId, IsQrScan:item.IsQrScan})}
+       onPress={() => navigation.navigate(NavRoutes.TRIPDETAILS,{TripId:item.TripId, IsQrScan:item.IsQrScan, EndedTrip:item.EndTrip, TripStart:item.TripStart})}
        //onPress={() => navigation.navigate(NavRoutes.DRIVERORDERDETAILS,{TripId:item.TripId,IsQrScan:item.IsQrScan})} 
        style={styles.crad}>
         <View style={styles.detailswrapstyle}>
-             {/* <RNText style={styles.labelstyle} children={'Trip Code :'}/> */}
              <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.TripCode}/>
             <View style={{ ...RNStyles.flexRow,columnGap:wp(2),}} >
              <RNImage   style={styles.iconestyle} source={Images.box}/>
-             <RNText size={FontSize.font13}  children={item.TotalOrders}/>
+             <RNText family={FontFamily.Medium}  size={FontSize.font13}  children={item.TotalOrders}/>
            </View>
         </View>
             <View style={styles.detailswrapstyle}>
@@ -87,16 +94,36 @@ useEffect(() => {
              <RNText  style={styles.valuetextstyle} children={item.CreatedDate}/>
            </View>
 
-            {item.EndedTrip &&
-            <View style={{flexDirection:'row', alignItems:'flex-start'}}>
-            <View style={[styles.detailswrapstyle,{flex:1}]}>
-             <RNImage tintColor={Colors.Green}  style={styles.iconestyle} source={Images.successicone}/>
-             <RNText size={FontSize.font12} color={Colors.Green} family={FontFamily.SemiBold} style={styles.valuetextstyle} children={'Trip completed'}/>
-           </View> 
-            <RNImage  tintColor={Colors.Green}  style={{height:wp(7),width:wp(7)}} source={Images.DeliveryDone}/>
-           </View>}
+          {(item.EndedTrip || item.TripStart) && (item.EndedTrip ? 
+          <View>
+          <View style={{...RNStyles.flexRow, paddingTop:hp(1), paddingBottom:hp(1)}}>
+            <RNImage source={Images.successicone} tintColor={Colors.Orange} style={styles.iconestyle}/>
+              <View style={{height:hp(0.2), backgroundColor: Colors.Orange, flex:1}}/>
+            <RNImage source={Images.successicone} tintColor={Colors.Orange} style={styles.iconestyle}/>
+          </View>
+          <View style={{...RNStyles.flexRowBetween}}>
+            <RNText children={item.StartTime != null ? moment(item.StartTime).format("DD MMM h:mm A") : ''} align={'center'} style={styles.timetextstyle()} />
+            <RNText children={item.DurationText} align={'center'} style={styles.timetextstyle(Colors.Green)}   />
+            <RNText children={item.EndTime !=  null ? moment(item.EndTime).format("DD MMM h:mm A") : ''} align={'center'} style={styles.timetextstyle()}  />
+          </View>
+          </View>
+           : 
+           <View>
+           <View style={{...RNStyles.flexRow, paddingTop:hp(2)}}>
+            <RNImage source={Images.successicone} tintColor={Colors.Orange} style={styles.iconestyle}/>
+            <View style={{height:hp(0.2), backgroundColor: Colors.Orange + 40, flex:1}}>
+              <View style={{width: item.TripStart ? `${barWidth}%` : '0%',backgroundColor: Colors.Orange, flex:1}}/>
+              <View style={{position:'absolute', top:hp(-2.8), zIndex:9999, left:`${barWidth-2}%`}}>
+                <LottieView autoPlay loop source={require('../../assets/Lottie/track.json')} style={{height:wp(7), width:wp(7)}}/>
+                {/* <RNImage tintColor={Colors.Orange} source={Images.DeliveryPending} style={{height:wp(6), width:wp(6)}}/> */}
+              </View>
+            </View>
+            <View style={styles.roundestyle}/>
+          </View>
+          <RNText pTop={hp(0.5)} children={moment(item.StartTime).format("DD MMM h:mm A")} style={styles.timetextstyle()}  />
+          </View>)}
        </Pressable>
-      )}
+      )}}
        ListEmptyComponent={() => ( !isloading && 
         <View style={{...RNStyles.flexCenter}}>
           <LottieView autoPlay loop  style={{height:wp(60),width:wp(60)}} source={require('../../assets/Lottie/NotFound.json')}/>
@@ -131,8 +158,19 @@ const styles = StyleSheet.create({
      valuetextstyle:{
       flex:1
     },
-        iconestyle:{
+      iconestyle:{
       height:wp(4),
       width:wp(4),
     },
+    roundestyle:{
+      height:wp(3.5),
+      width:wp(3.5),
+      borderRadius:normalize(100),
+      backgroundColor: Colors.Orange
+    },
+    timetextstyle: (tcolor) => ({
+      color:tcolor ? tcolor :Colors.Orange,
+      fontSize:FontSize.font11,
+      fontFamily:FontFamily.Medium
+    })
 })

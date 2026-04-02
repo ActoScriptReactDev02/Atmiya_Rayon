@@ -128,7 +128,7 @@ const handletoast = (data) => {
         </View> 
       )}
       />
-     { confirmModal && <ConfirmationModal visible={confirmModal} toastdata={data => handletoast(data)} visible={confirmModal} OrderUniqueId={selecteddata.OrderUniqueId} 
+     { confirmModal && <ConfirmationModal description={'Are you sure you want to finalize this order? This will mark the order as confirmed.'} visible={confirmModal} toastdata={data => handletoast(data)}  OrderUniqueId={selecteddata.OrderUniqueId} 
      onRequestClose={() => {setconfirmModal(false), Setselecteddata({})}} onclose={() => {setconfirmModal(false), Setselecteddata({}),getorderapi()}}/>}
       {imagevisible && <ImageViewerModal onRequestClose={() =>{ setimagevisible(false), Setselecteddata({})}} visible={imagevisible} imageURL={selecteddata.OrderPhoto}/>}
         {showtoast.isShow && <RnToast  Message={showtoast.message} isSuccess={showtoast.Sucess} Title={showtoast.Title}  />}

@@ -11,24 +11,33 @@ import Geolocation from 'react-native-geolocation-service'
 import { NavRoutes } from '../../navigation'
 import LottieView from 'lottie-react-native'
 import { DeliveryOrderModal } from '../../components/DriverFlow'
+import { ConfirmationModal } from '../../components/TeamMember'
 
 
 const TripDetails = ({route}) => {
+  //console.log('route',route.params);
  const TripId = route.params.TripId
  const [data,setdata] = useState([])
  const [isloding, setisloding] = useState(false)
   const [selectTrip, setselectTrip] = useState(null);
  const navigation = useNavigation();
-  const watchId = useRef(null);
-  const hasNavigated = useRef(false);
+const watchId = useRef(null);
+const hasNavigated = useRef(false);
 const [selctedata, setselctedata] = useState({});
 const [visible, setvisible] = useState(false);
+const [confirmModal, setconfirmModal] = useState(false);
+const [tripstatus,settripstatus] = useState({
+  startTrip:route.params.TripStart || false,
+  endtrip:route.params.EndedTrip || false
+})
   const [showtoast,Setshowtoast] = useState({
   isShow:false,
   message:'',
-  Sucess:false,
+  Sucess:false,   
   Title:''
 })
+
+
   
 
   useEffect(() => {
@@ -170,6 +179,10 @@ const [visible, setvisible] = useState(false);
     //console.log('destination',destination);
     if (!destination) return;
 
+    if(!tripstatus.startTrip){
+      handletrip(data[0].TripId, true)
+    }
+
     const url = `https://www.google.com/maps/dir/?api=1&destination=${destination.latitude},${destination.longitude}&travelmode=driving`;
      Linking.openURL(url);
   };
@@ -199,12 +212,16 @@ const [visible, setvisible] = useState(false);
         );
         if (firstPending) {
           setselectTrip(firstPending);
+        } else{
+          setselectTrip(null)
         }
+        console.log('firstPending',firstPending);
+        
         }else{
           setdata([])
       }}else{
           setdata([])
-        }
+      }
       setisloding(false)
     }catch(error){
        setisloding(false)
@@ -235,11 +252,43 @@ const [visible, setvisible] = useState(false);
     setselctedata({});
     setvisible(false)
   }
+const handletrip = async ( triid, isstart ) => {
+  console.log('isstart', isstart);
+
+  try {
+    const response = await FetchMethod.POST({
+      EndPoint: isstart
+        ? `TripMaster/StartTrip/${triid}`
+        : `TripMaster/EndTrip/${triid}`,
+    });
+
+    console.log(
+      isstart ? 'StartTrip response' : 'EndTrip response',
+      response
+    );
+
+    if (response) {
+      if (response.ResponseCode === 0) {
+        if (isstart) {
+          settripstatus((p) => ({ ...p, startTrip: true }));
+        } else {
+          settripstatus((p) => ({ ...p, endtrip: true }));
+          setconfirmModal(false)
+        }
+      }
+    }
+
+  } catch (error) {
+     setconfirmModal(false)
+    console.log('Trip error --->', error);
+  }
+};
+  
 
   return (
     <RNContainer isLoading={isloding} style={{paddingHorizontal:wp(0)}}>
       <View style={{paddingHorizontal:wp(4)}}>
-        <RNHeader onLeftPress={() => navigation.navigate(NavRoutes.DRIVERHOME)} title={'Order'}/>
+        <RNHeader onLeftPress={() => navigation.navigate(NavRoutes.DRIVERHOME)} title={'Trip Details'}/>
         </View>
         <View style={{height:hp(40)}}>
      <MapView
@@ -295,12 +344,12 @@ const [visible, setvisible] = useState(false);
             <View style={{position:'absolute', right:wp(2)}}>
              {item.IsDelivery ?  <RNText family={FontFamily.SemiBold} color={item.IsDelivery ? Colors.Green :Colors.Orange} 
               children={item.IsDelivery ? 'Delivered' :'Pending⏳'}/> :
-              <Pressable hitSlop={20} onPress={() => handlenavigate(item)}>
+              <Pressable style={{opacity: !tripstatus.startTrip ? 0.5 :1}} disabled={!tripstatus.startTrip} hitSlop={20} onPress={() => handlenavigate(item)}>
                 <RNImage tintColor={Colors.Orange} style={{height:wp(5.5), width:wp(5.5)}} source={Images.scanner}/>
               </Pressable>}
               </View>
             </View>
-             <View style={styles.detailswrapstyle}>
+             <View style={styles.detailswrapstyle}> 
               <RNImage tintColor={Colors.Orange}  style={styles.iconestyle} source={Images.company}/>
               <RNText numOfLines={1} style={styles.subtitlestyle} children={item.FirstName + ' (' + item.CustomerCode + ')'}/>
           </View>
@@ -325,13 +374,18 @@ const [visible, setvisible] = useState(false);
               </View> 
        )}
       />
-     {selectTrip != null &&  <RNButton onPress={() => openMap()} btnstyles={{marginTop:hp(1), alignSelf:'center'}} title={'Start trip'}/>}
+     {selectTrip != null &&  <RNButton onPress={() => openMap()} btnstyles={{marginTop:hp(1), alignSelf:'center'}} 
+                     title={'Start trip'}/>}
+      {(selectTrip == null && tripstatus.startTrip && !tripstatus.endtrip)&&  (
+        <RNButton onPress={() => setconfirmModal(true)}  btnstyles={{marginTop:hp(1), alignSelf:'center'}}  title={'End trip'}/>)}
        {visible && <DeliveryOrderModal tosdata={data => handletoast(data)} visible={visible} 
                      OrderUniqueIds={selctedata.OrderUniqueId} 
                      onRequestClose={() => {setvisible(false), setselctedata({})}}
                      onclose={() => handleonclose()}
     />}
     {showtoast.isShow && <RnToast  Message={showtoast.message} isSuccess={showtoast.Sucess} Title={showtoast.Title}  />}
+    <ConfirmationModal visible={confirmModal} onpress={() => handletrip(data[0].TripId,false)} onRequestClose={() => setconfirmModal(false)}
+     description={'Are you sure you want to end this trip? Make sure all orders are delivered.'} />
     </RNContainer>
   )
 }

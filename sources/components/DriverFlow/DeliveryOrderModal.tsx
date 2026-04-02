@@ -73,8 +73,8 @@ const DeliveryOrderModal = ({visible,onRequestClose,OrderUniqueIds,tosdata, oncl
 const UpdateOrderDeliveryStatus = async () =>{
   setisnavigate(true);
   if(isvalid){
-  try{
     setisloading(true)
+  try{
     const response = await FetchMethod.POST({
       EndPoint:`TripMaster/UpdateOrderDeliveryStatus`,
       Params:{

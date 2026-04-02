@@ -5,7 +5,7 @@ import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '
 import { Images } from '../../constants'
 import FetchMethod from '../../api/FetchMethod'
 
-const ConfirmationModal = ({onRequestClose,OrderUniqueId,visible,toastdata,onclose}) => {
+const ConfirmationModal = ({onRequestClose,OrderUniqueId,visible,toastdata,onclose, description, onpress}) => {
 const [isloading,setisloading] = useState(false);
 
     const updateorder = async () => {
@@ -45,12 +45,12 @@ const [isloading,setisloading] = useState(false);
       <View style={styles.modalwrapstyle}>
           <RNImage tintColor={Colors.Orange} source={Images.warning} style={styles.iconestyle}/>
           <RNText style={styles.titltextstyle} children={'Are you sure?'}/>
-          <RNText align={'center'} children={'Are you sure you want to finalize this order? This will mark the order as confirmed.'}/>
+          <RNText align={'center'} children={description}/>
           <View style={styles.btnwrapstyle}>
             <Pressable onPress={() => onRequestClose()} style={[styles.btnstyle,{backgroundColor:Colors.BorderColor + 80,  borderColor:Colors.BorderColor}]}>
                 <RNText color={Colors.Black} children={'Cancel'} style={styles.btntextstyle}/>
             </Pressable>
-             <Pressable onPress={() => updateorder()} disabled={isloading}  style={[styles.btnstyle,{backgroundColor:Colors.Orange,borderColor:Colors.DarkBackgroundColor}]}>
+             <Pressable onPress={() => OrderUniqueId?  updateorder() : onpress() } disabled={isloading}  style={[styles.btnstyle,{backgroundColor:Colors.Orange,borderColor:Colors.DarkBackgroundColor}]}>
                  {isloading ? <ActivityIndicator size={'small'} color={Colors.White}/> :
                     <RNText color={Colors.White} children={'Confrim'} style={styles.btntextstyle}/>}
             </Pressable>
