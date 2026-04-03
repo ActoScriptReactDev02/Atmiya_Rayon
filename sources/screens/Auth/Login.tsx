@@ -90,7 +90,7 @@ const isvalid = isnavigate && state.password.length >4 && state.username.length 
     <View style={{...RNStyles.center}}>
     <RnImagesCard source={Images.Logo}/>
     <View style={styles.textsontinerstyle}>
-      <RNText style={styles.titlestyle} children={'WELCOME TO ATMIYA RAYON'}/>
+      <RNText style={styles.titlestyle} children={'WELCOME TO AATMIYA RAYON'}/>
         <RNText style={styles.subcontentstyle} children={'Please Login To Your Account'}/>
     </View>
     </View>

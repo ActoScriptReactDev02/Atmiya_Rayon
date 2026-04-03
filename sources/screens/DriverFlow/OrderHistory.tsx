@@ -27,7 +27,6 @@ useEffect(() => {
 
   const GetTripDetails = async () => {
     try{
-      
       setisloading(true)
      const response = await FetchMethod.GET({
       EndPoint:`TripMaster/GetTripDetails`
@@ -94,6 +93,12 @@ useEffect(() => {
              <RNText  style={styles.valuetextstyle} children={item.CreatedDate}/>
            </View>
 
+           <View style={[styles.detailswrapstyle,{paddingVertical:hp(0)}]}>
+             <RNImage   style={styles.iconestyle} source={item.OrderStatus == 'Pending' ? Images.errorIcone :Images.doneicone}/>
+             <RNText color={item.OrderStatus == 'Pending' ? Colors.Red : Colors.Green} size={FontSize.font12} family={FontFamily.Medium}  style={styles.valuetextstyle} children={item.OrderStatus}/>
+           </View>
+            
+
           {(item.EndedTrip || item.TripStart) && (item.EndedTrip ? 
           <View>
           <View style={{...RNStyles.flexRow, paddingTop:hp(1), paddingBottom:hp(1)}}>
@@ -122,6 +127,8 @@ useEffect(() => {
           </View>
           <RNText pTop={hp(0.5)} children={moment(item.StartTime).format("DD MMM h:mm A")} style={styles.timetextstyle()}  />
           </View>)}
+          
+            
        </Pressable>
       )}}
        ListEmptyComponent={() => ( !isloading && 

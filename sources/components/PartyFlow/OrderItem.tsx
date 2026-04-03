@@ -16,16 +16,20 @@ const OrderItem = ({item,editPress,deletepress,orderimagepress}) => {
           </TouchableOpacity>
             <View style={{flex:1}}>
             <View style={styles.titlewrapview}>
-             <RNText style={styles.valuetextstyle} numOfLines={1}  children={item.OrderCode}/>
+             <RNText   size={FontSize.font12} family={FontFamily.Medium}  numOfLines={1}  children={item.OrderCode}/>
+         <View style={{flex:1, alignItems:'flex-end'}}>
           <View style={[styles.orderflagstyle,{ 
-            borderColor:item.IsDelivered ? item.Delay ? Colors.Red : Colors.Green : item.IsOrderConfirm == 'Confirm' ? Colors.Green : Colors.Red ,
-            backgroundColor:(item.IsDelivered ? item.Delay ? Colors.Red : Colors.Green : item.IsOrderConfirm == 'Confirm' ? Colors.Green : Colors.Red )+ '20'
+            borderColor: (item.Delay || item.OrderStatus == 'Pending') ? Colors.Red : Colors.Green ,
+            backgroundColor: ((item.Delay || item.OrderStatus == 'Pending') ? Colors.Red : Colors.Green) + '20',
             }]}>
-               <RNText family={FontFamily.Medium} 
-               color={item.IsDelivered ? item.Delay ? Colors.Red : Colors.Green : item.IsOrderConfirm == 'Confirm' ? Colors.Green : Colors.Red}
-                size={FontSize.font11} pTop={hp(0.2)} numOfLines={1}  
-                children={item.IsDelivered ? item.Delay ? 'Delay Order' : 'Delivered' : item.IsOrderConfirm}
+               <RNText 
+               numOfLines={1}
+               family={FontFamily.Medium} 
+               color={(item.Delay || item.OrderStatus == 'Pending') ? Colors.Red : Colors.Green }
+               size={FontSize.font11} pTop={hp(0.2)} numOfLines={1}  
+               children={ item.Delay ? 'Delay Order'  :item.OrderStatus }
                 />
+          </View>
           </View>
            </View>
              <View style={styles.detailswrapstyle}>
@@ -45,7 +49,7 @@ const OrderItem = ({item,editPress,deletepress,orderimagepress}) => {
              <RNImage tintColor={Colors.Orange} style={styles.iconestyle} source={Images.cityicone}/>
              <RNText numOfLines={3}  style={styles.valuetextstyle} children={item.AddressDetails.City+ ', '+ item.AddressDetails.Pincode}/>
            </View>
-          { item.IsOrderConfirm != 'Confirm' &&<View style={[styles.detailswrapstyle,{justifyContent:'flex-end'}]}>
+          { item.OrderStatus == 'Pending' &&<View style={[styles.detailswrapstyle,{justifyContent:'flex-end'}]}>
             <Pressable onPress={editPress}>
                 <RNImage tintColor={Colors.Blue} style={styles.accbtnstyle} source={Images.Edit}/>
             </Pressable>
@@ -113,7 +117,9 @@ const styles = StyleSheet.create({
     },
     titlewrapview:{
       ...RNStyles.flexRow,
-      paddingBottom:hp(0.8)
+      paddingBottom:hp(0.8),
+      columnGap:wp(1.2),
+     // flex:1
     },
     accbtnstyle:{
        height:wp(4.5),
