@@ -25,6 +25,12 @@ const DeliveryOrderModal = ({visible,onRequestClose,OrderUniqueIds,tosdata, oncl
 
   const handlecamara = (type) => {
   ImagePicker.openCamera({
+      //  cropping: true,                // enable crop if needed
+      // includeBase64: true,          // capture first, convert later
+      // compressImageQuality: 0.95,    // high quality
+      // compressImageMaxWidth: 2000,   // large enough to keep clarity
+      // compressImageMaxHeight: 2000,
+      // avoidEmptySpaceAroundImage: true, 
     cropping: true,
     includeBase64: true,
     height:800,
@@ -35,6 +41,7 @@ const DeliveryOrderModal = ({visible,onRequestClose,OrderUniqueIds,tosdata, oncl
   })
   .then((image) => {
   // const fileSizeInMB = image.size / (1024 * 1024);
+  
     setstate(p => ({
   ...p,
   ...(type === 'Order' && {
@@ -69,6 +76,8 @@ const DeliveryOrderModal = ({visible,onRequestClose,OrderUniqueIds,tosdata, oncl
     }
   });
 };
+
+
 
 const UpdateOrderDeliveryStatus = async () =>{
   setisnavigate(true);

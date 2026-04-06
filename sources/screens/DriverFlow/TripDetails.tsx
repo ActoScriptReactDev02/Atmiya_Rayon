@@ -215,7 +215,7 @@ const [tripstatus,settripstatus] = useState({
         } else{
           setselectTrip(null)
         }
-        console.log('firstPending',firstPending);
+        //console.log('firstPending',firstPending);
         
         }else{
           setdata([])
@@ -359,7 +359,7 @@ const handletrip = async ( triid, isstart ) => {
           </View>
           <View style={styles.detailswrapstyle}>
                <RNImage tintColor={Colors.Orange} style={styles.iconestyle} source={Images.loaction}/>
-                <RNText numOfLines={2}  style={styles.valuetextstyle} children={item.Address + ', '+ item.Landmark + ', '+item.City+ ', '+ item.Pincode}/>
+                <RNText numOfLines={3}  style={styles.valuetextstyle} children={item.Address + ', '+ item.AddressLocation + ', '+ item.Landmark + ', '+item.City+ ', '+ item.Pincode}/>
           </View>
           <View style={styles.detailswrapstyle}>
               <RNImage tintColor={Colors.Orange} style={styles.iconestyle} source={Images.cityicone}/>
@@ -375,7 +375,7 @@ const handletrip = async ( triid, isstart ) => {
        )}
       />
      {selectTrip != null &&  <RNButton onPress={() => openMap()} btnstyles={{marginTop:hp(1), alignSelf:'center'}} 
-                     title={'Start trip'}/>}
+                     title={ tripstatus.startTrip ? 'Continue trip' : 'Start trip'}/>}
       {(selectTrip == null && tripstatus.startTrip && !tripstatus.endtrip)&&  (
         <RNButton onPress={() => setconfirmModal(true)}  btnstyles={{marginTop:hp(1), alignSelf:'center'}}  title={'End trip'}/>)}
        {visible && <DeliveryOrderModal tosdata={data => handletoast(data)} visible={visible} 

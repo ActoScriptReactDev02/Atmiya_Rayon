@@ -1,14 +1,15 @@
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Modal, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { RNButton, RNImage, RNInput, RnlabelInput, RNStyles, RNText, RnToast } from '../../common'
 import RNHeader from '../../common/RNHeader'
-import { Colors, FontFamily, FontSize, hp, normalize, wp } from '../../theme'
+import { Colors, FontFamily, FontSize, height, hp, normalize, width, wp } from '../../theme'
 import { Images } from '../../constants'
 import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardGestureArea, KeyboardStickyView } from 'react-native-keyboard-controller'
 import FetchMethod from '../../api/FetchMethod'
 import { useSelector } from 'react-redux'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import LottieView from 'lottie-react-native'
+import Geolocation from 'react-native-geolocation-service';
 
 
 const CreateAddressModal = ({visible,onRequestClose,onclose,Editdata}) => {
@@ -18,12 +19,14 @@ const CreateAddressModal = ({visible,onRequestClose,onclose,Editdata}) => {
    const [areaCodeData, setareaCodeData] = useState([]);
    const [arealoading, setarealoading] = useState(false);
    const [isShow, setisShow] = useState(false)
+   const [loaLoading, setloaLoading] = useState(false)
    const [showtoast,Setshowtoast] = useState({
      isShow:false,
      message:'',
      Sucess:false,
      Title:''
    })
+   const [myloaction,setmyloaction] = useState(false)
     const [state, setstate] = useState({
         address:'',
         city:'',
@@ -84,6 +87,100 @@ const isValid =
         }))
     }
   },[Editdata])
+
+    const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );0
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
+  };
+
+  const getLocation = async (loactionflag) => {
+  setloaLoading(true)
+  if (!loactionflag) {
+    setmyloaction(loactionflag)
+    setstate(p => ({
+      ...p,
+      address: '',
+      city: '',
+      defult: false,
+      landmark: '',
+      pincode: '',
+      loactionData: { description: '', lat: '', lng: '' },
+      area: { areaCodeId: 0, areaname: '' }
+    }));
+    setloaLoading(false);
+  } else {
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      setmyloaction(false)
+      return;
+    } 
+     setmyloaction(loactionflag)
+    Geolocation.getCurrentPosition(
+      async (pos) => {
+        const coords = pos.coords;
+        const result = await getAddress(coords.latitude, coords.longitude);
+        if (result) {
+          const parsed = extractAddress(result);
+          setstate(p => ({
+            ...p,
+            city: parsed.city || '',
+            landmark: parsed.landmark || '',
+            pincode: parsed.pincode || '',
+            loactionData: {
+              description: parsed.fullAddress || '',
+              lat: coords.latitude || '',
+              lng: coords.longitude || '',
+            }
+          }));
+          //console.log("Parsed Address:", parsed);
+        }
+        setloaLoading(false);
+      },
+      (error) => {
+        console.log(error);
+        setloaLoading(false);
+        setmyloaction(false)
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
+};
+
+  const getAddress = async (lat, lon) => {
+    //console.log('lat, lon',lat, lon);
+    
+  const response = await fetch(
+    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyCOBWtVtISFYRKyw3lhBNctKUnCpY6VEJ8`
+  );
+  const data = await response.json();
+  console.log('data',data);
+  
+  if (data.results.length > 0) {
+    console.log(data.results[0].formatted_address);
+    //return data.results[0].formatted_address;
+    return data.results[0];
+  }
+  return null;
+};
+const extractAddress = (result) => {
+  const comp = result.address_components;
+
+  const get = (type) =>
+    comp.find(c => c.types.includes(type))?.long_name || '';
+
+  return {
+    city: get('locality'),
+    area: get('sublocality') || get('sublocality_level_1'),
+    landmark: get('premise') || get('point_of_interest'),
+    pincode: get('postal_code'),
+    fullAddress: result.formatted_address,
+  };
+};
    
 const handletoast = (data) => {
    Setshowtoast({
@@ -221,16 +318,22 @@ const GetAreaCodeApi = async () => {
     <Modal visible={visible} onRequestClose={onRequestClose} statusBarTranslucent={true} style={{zIndex:999}}>
         <View style={styles.modalcontiner}>
             <RNHeader onLeftPress={onRequestClose} title={'Add New Address'}  />
+             <KeyboardAwareScrollView 
+             keyboardShouldPersistTaps="handled"   
+            nestedScrollEnabled={true} 
+            style={{flex:1}}
+            >
             <View style={{marginBottom:hp(1.5), paddingTop:hp(1)}}>
               <View style={styles.labelwrapstyle}>
                 <RNText style={styles.labelstyle} children={'Loaction (Google)'}/>
                  <RNText color={Colors.Red} children={'*'}/>
               </View>
               
-              <GooglePlacesAutocomplete
+             <View style={{opacity:Editdata !=null && Object.keys(Editdata).length > 0 ? 1 :myloaction ? 0.5 : 1}} 
+             pointerEvents={Editdata !=null && Object.keys(Editdata).length > 0 ? 'auto' :myloaction ? 'none' : 'auto'}>
+               <GooglePlacesAutocomplete 
               debounce={200}
               enablePoweredByContainer={false}
-                
               keyboardShouldPersistTaps="handled"
               fetchDetails={true}
                   styles={{
@@ -271,13 +374,16 @@ const GetAreaCodeApi = async () => {
                       components: 'country:in', 
                      }}
                    />
+             </View>
                  {loactionerror &&  <RNText size={FontSize.font9} color={Colors.Red} children={'Please enter a valid loaction'}/>}
-              </View>
-            <KeyboardAwareScrollView 
-             keyboardShouldPersistTaps="handled"   
-            nestedScrollEnabled={true} 
-            style={{flex:1}}
-            >
+                {Editdata !=null && Object.keys(Editdata).length > 0 ? <View/> :<Pressable disabled={loaLoading} style={styles.loactionbtnwrapstyle} onPress={() => getLocation(!myloaction)}>
+                  <RNImage tintColor={Colors.Orange} source={Images.loaction} style={{height:wp(4), width:wp(4)}}/>
+                  <RNText  pTop={hp(0.2)} size={FontSize.font12} children={ (myloaction && !loaLoading) ? 'Choose Different Location' :'Use Current Location'}/>
+                  { loaLoading && <ActivityIndicator size={'small'} color={Colors.Orange}/>}
+                </Pressable>}
+              </View>. 
+              <RNText children={myloaction? 'true':'false'}/>
+           
           <KeyboardAvoidingView>
             <View style={{  flex:1}}>
               
@@ -453,5 +559,16 @@ const styles = StyleSheet.create({
       right:wp(0),
       left:wp(0),
       top:hp(6),
+    },
+    loactionbtnwrapstyle:{
+      backgroundColor:Colors.DarkBackgroundColor +50,
+      ...RNStyles.flexRow,
+       columnGap:wp(2),
+       paddingVertical:hp(0.2),
+       paddingHorizontal:wp(2),
+       borderRadius:normalize(10),
+       alignSelf:'baseline',
+       borderWidth:normalize(1),
+       borderColor:Colors.Orange
     }
 })
