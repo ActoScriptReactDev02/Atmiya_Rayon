@@ -15,12 +15,11 @@ import { ConfirmationModal } from '../../components/TeamMember'
 
 
 const TripDetails = ({route}) => {
-  //console.log('route',route.params);
- const TripId = route.params.TripId
- const [data,setdata] = useState([])
- const [isloding, setisloding] = useState(false)
-  const [selectTrip, setselectTrip] = useState(null);
- const navigation = useNavigation();
+const TripId = route.params.TripId
+const [data,setdata] = useState([])
+const [isloding, setisloding] = useState(false)
+const [selectTrip, setselectTrip] = useState(null);
+const navigation = useNavigation();
 const watchId = useRef(null);
 const hasNavigated = useRef(false);
 const [selctedata, setselctedata] = useState({});
@@ -36,9 +35,6 @@ const [tripstatus,settripstatus] = useState({
   Sucess:false,   
   Title:''
 })
-
-
-  
 
   useEffect(() => {
     getTrippdetails();
